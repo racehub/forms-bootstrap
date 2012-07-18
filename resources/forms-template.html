@@ -1,27 +1,4 @@
-<!-- Form Template for Enlive, used with Twitter Bootstrap Kit
-Supported forms: input (text or password), select dropdown, text area, checkboxes,
-radio buttons, inline inputs (several text inputs on one line), file
-input, error and success messages.
-
-In a web page, you can use the defform macro with the following fields: 
-1. name: This assigns a name to the form element
-2. type: Suppoted types: text, password, checkbox, radio, file. Checkbox and radio can also be inline, ie "radio inline"
-3. size: Supported sizes: input-mini, input-small, input-medium, input-large, input-xlarge, input-xxlarge, as well as span1, span2, span3, etc
-4. label: What to display next to the form element
-5. inputs: A vector of [name1 content1 name2 content2 ...]. Used by
-   select, checkbox and radio.
-6. rows: Defines the number of rows for a text area
-7. text-area-content: A string of default text in a text area
-
-
-To do:
-support for 'placeholder' for input
-1. Support for help blocks (already done for checkbox/radio)
-2. Support for inline text inputs.
-3. Support for multiple select
-4. Support for focused / uneditable / disabled inputs / checkboxes etc
-5. Make sure we did checkbox input correctly in forms.clj, ie (content value-label)
---> 
+<!-- Form Template for Enlive, used with Twitter Bootstrap Kit --> 
   
 <form action="/someaction" method="post">
         <fieldset>
@@ -92,7 +69,8 @@ support for 'placeholder' for input
          class="btn" type="button" /></a> 
           </div>
 
-         <!-- Inline Inputs NOT FINISHED YET!!!!!!!!!!!!!!!!-->
+         <!-- Inline Inputs. 
+           TO DO: Clean this up-->
           <div class="control-group inline-inputs">
             <label>Date range</label>
             <div class="input">
