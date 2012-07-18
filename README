@@ -1,5 +1,7 @@
-# forms-bootstrap
+#forms-bootstrap
+Forms-Bootstrap is a utility for creating web forms in Clojure using Twitter's Bootstrap CSS.
 
+## Usage
 Supported forms: input (text or password), select dropdown, text area, checkboxes,
 radio buttons, inline inputs (several text inputs on one line), file
 input, error and success messages.
@@ -17,12 +19,9 @@ In a web page, you can use the defform macro with the following fields:
 TODO:
 Document placeholders, help blocks, inline inputs, multiple selects, focused / uneditable / disabled inputs.
 
-## Usage
-
-FIXME: write
 
 ## License
 
-Copyright (C) 2012 FIXME
+Copyright (C) 2012 David Petrovics
 
 Distributed under the Eclipse Public License, the same as Clojure.
