@@ -1,6 +1,6 @@
-# forms-bootstrap
+#forms-bootstrap
 
-FIXME: write description
+Utility for creating web forms in Clojure using Twitter's Bootstrap CSS.
 
 ## Usage
 
