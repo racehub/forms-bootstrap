@@ -1,5 +1,5 @@
 #forms-bootstrap
-Forms-Bootstrap is a utility for creating web forms in Clojure using Twitter's Bootstrap CSS.
+Forms-Bootstrap is a utility for creating web forms in Clojure using Twitter's Bootstrap CSS. In its current form, it is built to be used with the Noir web framework, Enlive HTML templating, and validation using Sandbar.
 
 ## Usage
 Supported forms: input (text or password), select dropdown, text area, checkboxes,
