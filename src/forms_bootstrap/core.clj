@@ -241,3 +241,108 @@
                               fields) 
                :submitter (when submit-label
                             (make-submit-button submit-label cancel-link))}))
+
+
+;;MACROS
+
+;; used by defform macro. converts sandbar errors to noir errors
+;; @vali/*errors* looks like:
+;;  {:title [["title must be an integer number!"]], :location [["location cannot be blank!"]]}
+(defn move-errors-to-noir
+  "Moves errors over to Noir and returns the form-data."
+  [form-data errors]
+  (doseq [[field [error]] errors]
+    (vali/set-error field error))
+  form-data)
+
+;;creates an errors / defaults map for a given params map
+;;ex:
+;; { :description {:errors ["description cannot be blank!"], :default ""}
+;; :location {:errors nil, :default "fda"}, :title {:errors
+;; ["title cannot be blank!"], :default ""}}
+(defn create-errors-defaults-map [m]
+  (println "errs-defs " m)
+  (into {} (for [[k v] m]
+             [(keyword k) {:errors (vali/on-error (keyword k) identity)
+                           :default v}]))) 
+    
+;;Takes a validator function, an action (route) to POST to, a sequence of maps
+;;each containing a form element's attributes, and a function to call
+;;in the POST handler on success
+;; pass this an on-fail function, and replace (store-errors... ) line
+;;with ~on-fail, and get rid of the (let [failure...) line
+(defmacro defform 
+  "Generates a form and registers a POST handler with Noir. TODO: Docs!"
+  [sym & {:keys [validator action fields on-success on-failure]
+          :or {on-success (constantly (response/redirect "/"))
+               validator  identity}
+          :as opts}] ;;opts is a map 
+  (assert (and action fields on-failure)
+          "Please provide :action, :fields and :on-failure to defform.")
+  `(do 
+     (defn ~sym
+       ([] (make-form ~@(apply concat opts))) ;;calls (make-form key
+       ;;val key val ...)
+       ([form-params#] ;;puts the 1st () as the last arg to the 2nd (), etc
+          (->> (create-errors-defaults-map form-params#)
+               (assoc ~opts :errors-and-defaults)
+               (apply concat)
+               (apply make-form)))
+       ([form-params# action#]
+          (->> (create-errors-defaults-map form-params#)
+               (assoc (assoc ~opts :action action#) :errors-and-defaults)
+               (apply concat)
+               (apply make-form))))
+       
+     (defpage [:post ~action] {:as m#} ;;m#=params from request map
+       ;;if-valid: (if m# passes validation)
+       ;; (~on-success m#)
+       ;; else (~on-failure (dissoc m# :_validation-errors) errors#) 
+       (if-valid ~validator m#
+                 ~on-success
+                 (comp ~on-failure move-errors-to-noir)))))
+
+(defmacro defform-lite
+  "Generates a form with the given inputs"
+  [sym & {:as opts}]
+  `(do 
+     (defn ~sym
+       ([form-params# action#]
+          (->> (create-errors-defaults-map form-params#)
+               (assoc (assoc ~opts :action action#) :errors-and-defaults)
+               (apply concat)
+               (apply make-form))))))
+
+(defn insert-custom-inputs [opts custom-inputs]
+  (if (seq custom-inputs)
+    (into []
+          (for [field (:fields opts)]
+            (if-let [akey (keyword (:name field))] 
+              (assoc field :inputs 
+                     (akey custom-inputs)))))
+    (vec (:fields opts))))
+
+(defmacro defform-custom-post
+  "Generates a form with the given inputs. Also generates a post handler for the given url"
+  [sym & {:keys [validator fields on-success on-failure post-url] :as opts}]
+  (assert (and validator fields on-success on-failure post-url)
+          "Please provide :validator, :fields, :on-success, :on-failure and :post-url to defform.")
+  `(do 
+     (defn ~sym 
+       ([form-params# action#]
+          (->> (create-errors-defaults-map form-params#)
+               (assoc (assoc ~opts :action action#) :errors-and-defaults)
+               (apply concat)
+               (apply make-form)))
+       ([form-params# action# cancel-link# custom-inputs#] 
+          (->> (create-errors-defaults-map form-params#)
+               (assoc (-> (assoc ~opts :fields (insert-custom-inputs ~opts custom-inputs#))
+                          (assoc :action action#)
+                          (assoc :cancel-link cancel-link#))
+                 :errors-and-defaults)
+               (apply concat)
+               (apply make-form))))
+     (defpage [:post ~post-url] {:as m#}  
+       (if-valid ~validator m#
+                 ~on-success
+                 (comp ~on-failure move-errors-to-noir)))))
