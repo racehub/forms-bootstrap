@@ -6,4 +6,5 @@
                  [enlive "1.0.1"]
                  [org.clojars.dpetrovics/sandbar "0.4.0-SNAPSHOT"]]
   :dev-dependencies [[swank-clojure "1.3.0-SNAPSHOT"]]
-  :source-path "src")
+  :source-path "src"
+  :main  forms-bootstrap.server)
