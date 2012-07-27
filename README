@@ -1,20 +1,75 @@
 #forms-bootstrap
 Forms-Bootstrap is a utility for creating web forms in Clojure using Twitter's Bootstrap CSS. In its current form, it is built to be used with the Noir web framework, Enlive HTML templating, and validation using Sandbar.
+You can use forms-bootstarp to quickly make nicely styled forms for your web app. It is easy to validate your forms and display well formatted error messages next to the appropriate fields. You can also preopulate a form with default data from a source of your choice.
+
+I am working on this library in my spare time, and there is much that still needs to be done!
 
 ## Usage
 Supported forms: input (text or password), select dropdown, text area, checkboxes,
 radio buttons, inline inputs (several text inputs on one line), file
 input, error and success messages.
 
-In a web page, you can use the defform macro with the following fields: 
+##Snippets
+We define the following snippets (see Enlive Templating) for web forms:
+basic-form: Takes in an action, a submit button, class, encode type, and a collection of transformed content called fields. 
+The following form field snippets are defined:
+input-field
+text-area-field
+dropdown-menu
+checkbox-or-radio
+file-input
+make-submit-button
+
+##Defform Macro
+The defform macro is really convenient for making forms very quickly. You pass it an action, a collection of fields, a validator function, a function to execute on success, and a function to execute on failure.
+
+An action can be something like "user/signup"
+
+You can use the defform macro with the following fields: 
 1. name: This assigns a name to the form element
-2. type: Supported types: text, password, checkbox, radio, file. Checkbox and radio can also be inline, ie "radio inline"
+2. type: Supported types: text, password, checkbox, radio, file. 
 3. size: Supported sizes: input-mini, input-small, input-medium, input-large, input-xlarge, input-xxlarge, as well as span1, span2, span3, etc
 4. label: What to display next to the form element
 5. inputs: A vector of [name1 content1 name2 content2 ...]. Used by
    select, checkbox and radio.
 6. rows: Defines the number of rows for a text area
 7. text-area-content: A string of default text in a text area
+
+Here is an example:
+
+(defform signup-form
+  :validator user/signup-validator
+  :action "/signup"
+  :submit-label "Sign Up!"
+  :cancel-link "/"
+  :fields [{:name "first-name"
+            :label "First Name"
+            :type "text"}
+           {:name "last-name"
+            :label "Last Name"
+            :type "text"}
+           {:name "gender"
+            :label "Gender"
+            :type "radio"
+            :inputs [["male" "Male"]
+                     ["female" "Female"]]}
+           {:name "email"
+            :label "Email Address"
+            :type "text"}
+           {:name "username"
+            :label "Username"
+            :type "text"}
+           {:name "password"
+            :label "Password"
+            :type "password"}]
+  :on-success (fn [{uname :username :as user-map}]
+                (user/add! user-map)
+                (user/login! uname)
+                (session/flash-put! :flash "User created successfully.")
+                (response/redirect "/"))
+  :on-failure (fn [form-data]
+                (session/flash-put! :flash "Please Fix Errors")
+                (render "/signup" form-data)))
 
 TODO:
 Document placeholders, help blocks, inline inputs, multiple selects, focused / uneditable / disabled inputs.
