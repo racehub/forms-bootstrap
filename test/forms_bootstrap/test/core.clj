@@ -3,21 +3,22 @@
         clojure.test
         forms-bootstrap.core
         noir.core
-        net.cgrand.enlive-html))
+        net.cgrand.enlive-html)
+  (:require [noir.response :as response]))
 
 (def test-template "forms_bootstrap/test/test-page.html")
 
 (deftemplate test-layout
   test-template
-  [{:keys [make-form-tests]}]
-  [:section] (clone-for [[form-test header descr] make-form-tests]
+  [{:keys [form-tests]}]
+  [:section] (clone-for [[form-test header descr] form-tests]
                         [:div.page-header :h3] (html-content
                                                 (str header " <small>" descr "</small"))
                         [:div.formhere] (content form-test)))
 
 ;;This first example uses the make-form function 
 (defpage "/" [] 
-  (test-layout {:make-form-tests
+  (test-layout {:form-tests
                 [[(make-form
                  :action "someaction"
                  :submit-label "Send it!"  
@@ -41,3 +42,42 @@
                   "Example One"
                   "A Longer Form"]]
                 }))
+
+(form-helper helper-example
+  :validator identity
+  :post-url "/signup"
+  :submit-label "Sign Up!"
+  :fields [{:name "first-name"
+            :label "First Name"
+            :type "text"}
+           {:name "last-name"
+            :label "Last Name"
+            :type "text"}
+           {:name "gender"
+            :label "Gender"
+            :type "radio"
+            :inputs [["male" "Male"]
+                     ["female" "Female"]]}
+           {:name "email"
+            :label "Email Address"
+            :type "text"}
+           {:name "username"
+            :label "Username"
+            :type "text"}
+           {:name "password"
+            :label "Password"
+            :type "password"}]
+  :on-success (fn [{uname :username :as user-map}]
+                ;;on success actions here
+                 (response/redirect "/"))
+  :on-failure (fn [form-data]
+                ;;some failure action here
+                (render "/signup" form-data)))
+
+(defpage "/form-helper"
+  []
+  (test-layout
+   {:form-tests
+    [[(helper-example nil "action-here" "/")
+      "Form-helper Example"
+      "Uses the form-helper macro for easy validation."]]}))

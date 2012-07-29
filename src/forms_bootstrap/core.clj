@@ -223,8 +223,9 @@
   button. Fields is a sequence of maps, each containing a form element's
   attributes."
   [& {:keys [action class fields submit-label
-             errors-and-defaults enctype cancel-link]
+             errors-and-defaults enctype cancel-link] :as form-map
       :or {class "form-horizontal"}}]
+  (println "make form input map: " form-map)
   (basic-form {:action action
                :class class
                :enctype  enctype
@@ -256,46 +257,38 @@
 
 (defn create-errors-defaults-map
   "Used when a page is rendered again, typically due to a validation
-  error. It takes in the form params map (noir provides these in
-  defpage) and returns the map with the form elements as keys and a
-  value such as {:errors ['error mesage'] :default 'default message
-  here'} for each key."
+  error. Also used to pass in data to prepoluate a form. It takes in
+  the form params map (noir and returns the map with the form elements
+  as keys and a value such as {:errors ['error mesage'] :default
+  'default message here'} for each key."
   [m]
   (println "errs-defs " m)
   (into {} (for [[k v] m]
              [(keyword k) {:errors (vali/on-error (keyword k) identity)
                            :default v}]))) 
     
-;;Takes a validator function, an action (route) to POST to, a sequence of maps
-;;each containing a form element's attributes, and a function to call
-;;in the POST handler on success
-(defmacro defform 
-  "Generates a form and registers a POST handler with Noir. TODO: Docs!"
-  [sym & {:keys [validator action fields on-success on-failure]
+;;Takes a validator function, an url (route) to POST to, a sequence of
+;;maps each containing a form element's attributes, a submit label for
+;;the form, and functions to call in the POST handler on success or
+;;failure
+(defmacro form-helper
+  "Generates a function that can be used the make the form, and registers a POST handler with Noir. "
+  [sym & {:keys [fields post-url validator on-success on-failure submit-label]
           :or {on-success (constantly (response/redirect "/"))
                validator  identity}
           :as opts}] 
-  (assert (and action fields on-failure)
-          "Please provide :action, :fields and :on-failure to defform.")
-  `(do 
+  (assert (and post-url fields on-success on-failure)
+          "Please provide :post-url, :fields, and :on-failure to defform.")
+  `(do
      (defn ~sym
-       ([] (make-form ~@(apply concat opts))) ;;calls (make-form key
-       ;;val key val ...)
-       ([form-params#] ;;puts the 1st () as the last arg to the 2nd (), etc
+       ([form-params# action# cancel-link#]
           (->> (create-errors-defaults-map form-params#)
-               (assoc ~opts :errors-and-defaults)
-               (apply concat)
-               (apply make-form)))
-       ([form-params# action#]
-          (->> (create-errors-defaults-map form-params#)
-               (assoc (assoc ~opts :action action#) :errors-and-defaults)
+               (assoc (-> (assoc ~opts :action action#)
+                          (assoc :cancel-link cancel-link#))
+                 :errors-and-defaults)
                (apply concat)
                (apply make-form))))
-       
-     (defpage [:post ~action] {:as m#} ;;m#=params from request map
-       ;;if-valid: (if m# passes validation)
-       ;; (~on-success m#)
-       ;; else (~on-failure (dissoc m# :_validation-errors) errors#) 
+     (defpage [:post ~post-url] {:as m#}
        (if-valid ~validator m#
                  ~on-success
                  (comp ~on-failure move-errors-to-noir)))))
