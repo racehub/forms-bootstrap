@@ -24,7 +24,7 @@
 (defpage "/" [] 
   (test-layout {:links
                 [["/make-form" "Make-Form Example"]
-                 ["/form-helper" "Form-Helper Example"]]}))
+                 ["/form-helper" "Form-Helper Example"]]})) 
 
 (defpage "/make-form" []
   (test-layout {:form-tests

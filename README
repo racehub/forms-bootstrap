@@ -17,7 +17,8 @@ Open your favorite browser and go to:
 http://localhost:8080/
 
 ##Snippets
-We define the following snippets (see Enlive Templating) for web forms:
+We define the following snippets (see Enlive Templating) for web forms: (Snippets are functions that return a collection of nodes. You can use them with Enlive functions such as 'content' that take a sequence of nodes and return a transformation function, which you can use in a 'deftemplate' to get a sequence of strings in HTML to use in a Noir defpage.) Sounds complicated but its actually simple to use and makes templating a cinch!
+
 basic-form: Takes in an action, a submit button, class, encode type, and a collection of transformed content called fields. 
 The following form field snippets are defined:
 input-field
