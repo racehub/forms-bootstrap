@@ -225,7 +225,7 @@
   [& {:keys [action class fields submit-label
              errors-and-defaults enctype cancel-link] :as form-map
       :or {class "form-horizontal"}}]
-  (println "make form input map: " form-map)
+  (println "make-form input map: " form-map "\n")
   (basic-form {:action action
                :class class
                :enctype  enctype
@@ -247,10 +247,14 @@
 ;;MACROS
 
 ;; @vali/*errors* looks like:
-;;  {:title [["title must be an integer number!"]], :location [["location cannot be blank!"]]}
+;;  {:title [["title must be an integer number!"]], :location
+;;  [["location cannot be blank!"]]}
+;; 'errors' are the sandbar :_validation-errors from the result of validating
+;;  the form map.
 (defn move-errors-to-noir
   "Moves errors from sandbar to Noir and returns the form-data."
   [form-data errors]
+  (println "sandbar errors (move-errors-to-noir): " errors "\n")
   (doseq [[field [error]] errors]
     (vali/set-error field error))
   form-data)
@@ -258,11 +262,14 @@
 (defn create-errors-defaults-map
   "Used when a page is rendered again, typically due to a validation
   error. Also used to pass in data to prepoluate a form. It takes in
-  the form params map (noir and returns the map with the form elements
-  as keys and a value such as {:errors ['error mesage'] :default
+  the form params map and returns it with the form elements
+  as keys and values such as {:errors ['error mesage'] :default
   'default message here'} for each key."
   [m]
-  (println "errs-defs " m)
+  (println "form params (from errors/defaults): " m "\n")
+;;Idea: Instead of going through [[k v] m], go through all the noir errors
+  ;;and match them with keywords in form params (adding as necesary?)
+  
   (into {} (for [[k v] m]
              [(keyword k) {:errors (vali/on-error (keyword k) identity)
                            :default v}]))) 
