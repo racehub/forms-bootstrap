@@ -52,14 +52,14 @@ macro also creates a POST handler using Noir's defpage-- it takes in the form pa
 either the on-success or on-failure function.
 
 Each 'field' in the :fields portion of a form-helper macro call can contain: 
-1. name: This assigns a name to the form element
-2. type: Supported types: text, password, checkbox, radio, file. 
-3. size: Supported sizes: input-mini, input-small, input-medium, input-large, input-xlarge, input-xxlarge, as well as span1, span2, span3, etc
-4. label: What to display next to the form element
-5. inputs: A vector of [name1 content1 name2 content2 ...]. Used by
-   select, checkbox and radio.
-6. rows: Defines the number of rows for a text area
-7. text-area-content: A string of default text in a text area
+
+* name: This assigns a name to the form element
+* type: Supported types: text, password, checkbox, radio, file. 
+* size: Supported sizes: input-mini, input-small, input-medium, input-large, input-xlarge, input-xxlarge, as well as span1, span2, span3, etc
+* label: What to display next to the form element
+* inputs: A vector of [name1 content1 name2 content2 ...]. Used by select, checkbox and radio.
+* rows: Defines the number of rows for a text area
+* text-area-content: A string of default text in a text area
 
 Here is an example:
 
