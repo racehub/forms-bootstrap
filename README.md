@@ -1,7 +1,7 @@
 # Forms-Bootstrap #
 Forms-Bootstrap is a utility for creating web forms in Clojure, styled using 
 [Twitter's Bootstrap CSS](http://twitter.github.com/bootstrap/). It is built to be used with the 
-[Noir web framework](https://github.com/noir-clojure/noir), 
+[Noir](https://github.com/noir-clojure/noir) web framework, 
 [Enlive](https://github.com/cgrand/enlive) HTML templating, and validation using 
 [Sandbar](https://github.com/brentonashworth/sandbar).
 You can use forms-bootstrap to quickly make nicely styled forms for your web app. It is easy to validate 
@@ -63,53 +63,55 @@ Each 'field' in the :fields portion of a form-helper macro call can contain:
 
 Here is an example:
 
-   (form-helper example-form
-      :validator user/edit-validator
-      :post-url "/users/:username/edit"
-      :submit-label "Edit"
-      :fields [{:name "first-name"
-                :label "First Name"
-                :type "text"}
-               {:name "last-name"
-                :label "Last Name"
-                :type "text"}
-               {:name "gender"
-                :label "Gender"
-                :type "radio"
-                :inputs [["male" "Male"]
-                         ["female" "Female"]]}
-               {:name "email"
-                :label "Email Address"
-                :type "text"}
-               {:name "username"
-                :label "Username"
-                :type "text"}
-               {:name "password"
-                :label "Password"
-                :type "password"}]
-      :on-success (fn [{uname :username :as user-map}]
-                     (user/add! user-map)
-                     (user/login! uname)
-                     (session/flash-put! :flash "User created successfully.")
-                     (response/redirect "/"))
-      :on-failure (fn [form-data]
-                     (session/flash-put! :flash "Please Fix Errors")
-                     (render "/signup" form-data)))
-
+      (form-helper example-form
+         :validator user/edit-validator
+         :post-url "/users/:username/edit"
+         :submit-label "Edit"
+         :fields [{:name "first-name"
+                   :label "First Name"
+                   :type "text"}
+                  {:name "last-name"
+                   :label "Last Name"
+                   :type "text"}
+                  {:name "gender"
+                   :label "Gender"
+                   :type "radio"
+                   :inputs [["male" "Male"]
+                            ["female" "Female"]]}
+                  {:name "email"
+                   :label "Email Address"
+                   :type "text"}
+                  {:name "username"
+                   :label "Username"
+                   :type "text"}
+                  {:name "password"
+                   :label "Password"
+                   :type "password"}]
+         :on-success (fn [{uname :username :as user-map}]
+                        (user/add! user-map)
+                        (user/login! uname)
+                        (session/flash-put! :flash "User created successfully.")
+                        (response/redirect "/"))
+         :on-failure (fn [form-data]
+                        (session/flash-put! :flash "Please Fix Errors")
+                        (render "/signup" form-data)))
+   
 Then to use the generated 'example-form' function:
 
-(defpage "/users/:username/edit"
-  {:keys[username] :as m}
-  (your-enlive-template-here (example-form m (str "users/" username "/edit") "/users"))) 
+      (defpage "/users/:username/edit"
+         {:keys[username] :as m}
+         (your-enlive-template-here 
+            (example-form m 
+                          (str "users/" username "/edit") "/users"))) 
 
 Your Enlive template should make sure to link to Twitter Bootstrap CSS to make use of their styling.
 
 
 ## TO DO ##
--Should we stick with Sandbar, or move the error handling over to Noir?
--Deal with empty checkboxes, radios, or dropdowns. In this situations the name of the form field is not present in the form params map, so we need a new way of searching for errors (in create-errors-defaults-map).
--More testing.
--Formatting seems to be an issue if we bump from Twitter Bootstrap 2.0.0 to 2.0.4, figure out what's changed
+* Should we stick with Sandbar, or move the error handling over to Noir?
+* Deal with empty checkboxes, radios, or dropdowns. In this situations the name of the form field is not present in the form params map, so we need a new way of searching for errors (in create-errors-defaults-map).
+* More testing.
+* Formatting seems to be an issue if we bump from Twitter Bootstrap 2.0.0 to 2.0.4, figure out what's changed
 
 
 ## License ##
