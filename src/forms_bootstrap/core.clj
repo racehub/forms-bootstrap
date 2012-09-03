@@ -166,7 +166,7 @@
                  (set-attr :for name))
   [:select] (constantly (select-lite m))
   [:div.controls]  (add-spans errors help-inline help-block))
-
+ 
 ;;Creates a radio or checkbox form list with the given attributes
 ;; ex: {:type "select" :name "cars" :size "xlarge" :label "Cars"
 ;;      :inputs [["volvo" "Volvo"] ["honda" "Honda"]]}
@@ -315,7 +315,7 @@
                :legend legend
                :class class
                :enctype  enctype
-               :fields   (map (fn [{:keys [name] :as m}]
+               :fields   (map (fn [{:keys [name type] :as m}]
                                 (make-field
                                  class
                                  (merge m
