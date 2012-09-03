@@ -171,7 +171,7 @@
 ;; ex: {:type "select" :name "cars" :size "xlarge" :label "Cars"
 ;;      :inputs [["volvo" "Volvo"] ["honda" "Honda"]]}
 (defsnippet checkbox-or-radio-lite
-  form-template
+  form-template 
   [:div.checkbox-or-radio :div.controls :label]
   [{:keys [name inputs type errors default]}]
   [:label] (clone-for [[value value-label] inputs] 
@@ -319,7 +319,7 @@
                                 (make-field
                                  class
                                  (merge m
-                                        (if (= type "inline-fields")
+                                        (if (string-contains? type "inline-fields")
                                           (inline-errs-defs m errors-and-defaults)
                                           (get errors-and-defaults
                                                (keyword
