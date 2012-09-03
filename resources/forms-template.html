@@ -1,88 +1,73 @@
-<!-- Form Template for Enlive, used with Twitter Bootstrap Kit -->   
-<form action="/someaction" method="post">
-        <fieldset>
-          <legend>Example form legend</legend>
+<!-- Form Template for Enlive, designed for Twitter Bootstrap 2.1-->   
 
-          <!-- Input Field (input classes: mini, small, medium, large,
-          xlarge, xxlarge
-          If there is an error, append error to div class and input
-          class and add in the span line below  -->
-          <div class="control-group input-field">
-            <label for="namehere">X-Large input</label>
-            <div class="controls">
-              <input class="input-xlarge" name="namehere" type="text" /> 
-             <span class='help-inline'>Error message here</span> 
-            </div>
-          </div><!-- /control-group input-field -->
+<form class="form-horizontal" action="/someaction" method="post">
+	<!-- Input Field -->
+	<div class="control-group input-field">
+		<label class="control-label" for="namehere">X-Large input</label>
+		<div class="controls">
+			<input class="input-xlarge" name="namehere" type="text" /> 
+		</div>
+	</div>
+	<!-- /Input Field-->
 
-           <!-- Text Area-->
-          <div class="control-group text-area">
-            <label for="namehere">textarea</label>
-            <div class="controls">
-              <textarea class="input-xxlarge" name="namehere" rows="3">
-              Hello </textarea>
-               <span class="help-inline">error message here</span>
-            </div>
-          </div><!-- /control-group -->
- 
-          <!-- Normal Size Select (dropdown menu) -->
-          <div class="control-group select-dropdown">
-            <label for="namehere">Select</label>
-              <select name="namehere">
-                <option value="volvo">Volvo</option>
-              </select>
-              <span class="help-inline">Error message here</span>
-          </div><!-- /control-group select-dropdown-->
- 
+	<!-- Text Area-->
+	<div class="control-group text-area">
+		<label class="control-label" for="namehere">textarea</label>
+		<div class="controls">
+			<textarea class="input-xxlarge" name="namehere" rows="3">
+				Hello 
+			</textarea>
+		</div>
+	</div>
+	<!-- /Text Area -->
 
-          <!-- Checkbox or Radio -->
-          <!-- make the input name the same if you only want one
-          selected -->
-          <div class="control-group checkbox-or-radio">
-            <label class ="control-label" name="namehere">List of options</label>
-            <div class="controls">
-              <label class="checkbox">
-                  <input type="checkbox" name="optionslist"  value="option1" />  <!-- can also be 'disabled' or
-                    'checked'-->
-             </label> 
-              <span class="help-block"> 
-                <strong>Note:</strong> Labels surround all the options for much larger click areas and a more usable form.
-              </span>
-            </div>
-          </div><!-- /control-group checkbox-or-radio-->
+	<!-- Select (dropdown) -->
+	<div class="control-group select-dropdown">
+		<label class="control-label" for="namehere">Select</label>
+		<div class="controls">
+			<select id="" class="xlarge" name="namehere">
+				<option value="optiona">Option A</option>
+			</select>
+		</div> 
+	</div>
+	<!-- /Select--> 
 
+	<!-- Checkbox or Radio -->
+	<!-- input name is typically the same for all inputs. add a '[]' for checkbox names where you want multiple possible values -->
+	<div class="control-group checkbox-or-radio">
+		<label class ="control-label" name="namehere">List of options</label>
+		<div class="controls">
+			<label class="checkbox">
+				<input type="checkbox" name="optionslist"  value="option1" />
+			</label> 
+		</div>
+	</div>
+	<!-- /checkbox-->
 
-          <!-- File Input -->
-          <div class="control-group file-input">
-            <label for="namehere">File input</label>
-            <div class="controls">
-              <input class="input-file" name="namehere" type="file" />
-              <span class="help-inline">Error message goes here</span> 
-            </div>
-          </div><!-- /control-group -->
+	<!-- File Input -->
+	<div class="control-group file-input">
+		<label class="control-label" for="namehere">File input</label>
+		<div class="controls">
+			<input class="input-file" name="namehere" type="file" />
+		</div>
+	</div>
+	<!-- /File Input -->
 
-          <!-- Submit Button -->
-          <div class="form-actions" id="submit_button">
-			<button type="submit" class="btn btn-primary">Submit</button>
-         <a href="#" id="cancel-link"><input value="Cancel"
-         class="btn" type="button" /></a> 
-          </div>
+	<!-- Submit Button -->
+	<div class="form-actions" id="submit-button">
+		<button type="submit" class="btn">Submit</button>
+		<a href="#" id="cancel-link">
+			<input value="Cancel"
+			class="btn" type="button" />
+		</a> 
+	</div>
+	<!--/Submit Button --> 
 
-         <!-- Inline Inputs. 
-           TO DO: Clean this up-->
-          <div class="control-group inline-inputs">
-            <label>Date range</label>
-            <div class="input">
-              <div class="inline-inputs">
-                <input class="small" type="text" value="May 1, 2011" />
-                <input class="mini" type="text" value="12:00am" />
-                to
-                <input class="small" type="text" value="May 8, 2011" />
-                <input class="mini" type="text" value="11:59pm" />
-                <span class="help-block">All times are shown as Pacific Standard Time (GMT -08:00).</span>
-              </div>
-            </div>
-          </div><!-- /control-group -->
-       
-       </fieldset>
+	<!-- Inline Inputs (controls-row)-->
+	<div class="control-group inline-fields">
+		<label class="control-label"></label>
+		<div class="controls controls-row">              
+		</div>
+	</div>
+	<!-- /Inline -->
 </form>

@@ -1,7 +1,7 @@
 (ns forms-bootstrap.test.core
   (:use forms-bootstrap.core
         clojure.test
-        forms-bootstrap.core
+        forms-bootstrap.util
         noir.core
         net.cgrand.enlive-html)
   (:require [noir.response :as response]
@@ -32,15 +32,29 @@
                    :action "someaction"
                    :submit-label "Send it!"
                    :cancel-link "/"
-                   :fields [{:type "text" :name "nickname" :label "Nick Name" :size "input-large"}
-                            {:type "password" :name "password" :label "Password"}
-                            {:type "text" :name "city" :label "City" :placeholder "Placeholder!"}
-                            {:type "text-area" :name "description" :label "Favorite Quote"}
-                            {:type "select" :name "colors" :label "Favorite Color"
+                   :fields [{:type "text"
+                             :name "nickname"
+                             :label "Nick Name"
+                             :size "input-large"}
+                            {:type "password"
+                             :name "password"
+                             :label "Password"}
+                            {:type "text"
+                             :name "city"
+                             :label "City"
+                             :placeholder "Placeholder!"}
+                            {:type "text-area"
+                             :name "description"
+                             :label "Favorite Quote"}
+                            {:type "select"
+                             :name "colors"
+                             :label "Favorite Color"
                              :inputs [["blue" "Blue"]
                                       ["red" "Red"]
                                       ["yellow" "Yellow"]]}
-                            {:type "radio" :name "cars" :label "Favorite Car"
+                            {:type "radio"
+                             :name "cars"
+                             :label "Favorite Car"
                              :inputs [["honda" "Honda"]
                                       ["toyota" "Toyota"]
                                       ["chevy" "Chevy"]]}
@@ -48,10 +62,11 @@
                              :inputs [["german" "German"]
                                       ["french" "French"]
                                       ["english" "English"]]}
-                            {:type "file-input" :name "afile" :label "Choose a pic"}])
+                            {:type "file-input"
+                             :name "afile"
+                             :label "Choose a pic"}])
                   "Example One"
-                  "How to use make-form"]]
-                }))
+                  "How to use make-form"]]}))
 
 (defn email-valid?
   [{:keys [email] :as m}]
@@ -68,19 +83,50 @@
              :submit-label "Sign Up!"
              :fields [{:name "first-name"
                        :label "First Name"
+                       :help-inline "This is 'help-inline' for the first name field."
                        :type "text"}
                       {:name "last-name"
+                       :help-block "This is 'help-block' for the last
+                       name field. You can fit more stuff like this."
                        :label "Last Name"
                        :type "text"}
                       {:name "gender"
-                       :label "Gender"
-                       :type "radio"
+                       :label "Gender" 
+                       :type "radio inline"
                        :inputs [["male" "Male"]
                                 ["female" "Female"]]}
+                      {:name "options"
+                       :label "Options"
+                       :type "select"
+                       :inputs [["option1" "Option 1"]
+                                ["option2" "Option 2"]
+                                ["option3" "Option 3"]]}
                       {:name "email"
                        :label "Email Address"
                        :type "text"
                        :placeholder "Try using 'blah'"}
+                      {:type "inline-fields"
+                       :name "birthday"
+                       :label "Birthday"
+                       :columns [{:name "birthday-day"
+                                  :type "select"
+                                  :size "input-small" 
+                                  :inputs (let [days (reduce #(conj %1 [(str %2) (str %2)])
+                                                             [] (range 1 32))]
+                                            (insert days 0 ["" "Day"]))}
+                                 {:name "birthday-month"
+                                  :type "select"
+                                  :size "input-small" 
+                                  :inputs (let [days (reduce #(conj %1 [(str %2) (str %2)])
+                                                             [] (range 1 13))]
+                                            (insert days 0 ["" "Month"]))}
+                                 {:name "birthday-year"
+                                  :type "select"
+                                  :size "input-small"
+                                  :inputs (let [year (reduce #(conj %1 [(str %2) (str %2)])
+                                                             [] (reverse
+                                                                 (range 1900 2013)))]
+                                            (insert year 0 ["" "Year"]))}]}
                       {:name "colors[]"
                        :label "Favorite Colors"
                        :type "checkbox"
