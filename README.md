@@ -113,7 +113,7 @@ Here is an example:
                    :label "Email Address"
                    :placeholder "user@site.com"
                    :type "text"}
-		  {:type "inline-fields"	;;used to create several form controls in one row, in horizontal forms
+                  {:type "inline-fields"	;;used to create several form controls in one row, in horizontal forms
                    :name "birthday"
                    :label "Birthday"
                    :columns [{:name "birthday-day"
