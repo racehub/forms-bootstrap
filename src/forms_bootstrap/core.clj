@@ -8,7 +8,7 @@
             [noir.session :as session]
             [noir.response :as response]))
 
-(def form-template "../resources/forms-template.html")
+(def form-template "../resources/public/forms-template.html")
 
 ;;HELPER FUNCTIONS
 
@@ -357,7 +357,7 @@
   as keys and values such as {:errors ['error mesage'] :default
   'default message here'} for each key."
   [m]
-  (println "form params (from errors/defaults): " m "\n")
+;;  (println "form params (from errors/defaults): " m "\n")
 ;;Idea: Instead of going through [[k v] m], go through all the noir errors
   ;;and match them with keywords in form params (adding as necesary?)
   
