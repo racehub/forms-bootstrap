@@ -8,8 +8,7 @@
             [noir.session :as session]
             [noir.response :as response]))
 
-(def form-template "../resources/public/forms-template.html")
-
+(def form-template "forms_bootstrap/forms-template.html")
 ;;HELPER FUNCTIONS
 
 (defn handle-error-css
