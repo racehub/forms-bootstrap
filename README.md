@@ -13,7 +13,7 @@ Forms-Bootstrap is hosted on Clojars. Add
 
 	[forms-bootstrap "0.2.0-SNAPSHOT"]
 
-to your project.clj.
+to your dependencies in project.clj.
 
 Forms-Bootstrap uses Twitter Bootstrap Version 2.1. Make sure to download [Bootstrap CSS 2.1](http://twitter.github.com/bootstrap/) and add it to your HTML files!
 
@@ -106,14 +106,14 @@ Here is an example:
                    :type "text"}
                   {:name "gender"
                    :label "Gender"
-                   :type "radio"   //can also be 'radio inline'
-                   :inputs [["male" "Male"]		//first thing is the value, second is the label
+                   :type "radio"   ;;can also be 'radio inline'
+                   :inputs [["male" "Male"]		;;first thing is the value, second is the label
                             ["female" "Female"]]}
                   {:name "email"
                    :label "Email Address"
                    :placeholder "user@site.com"
                    :type "text"}
-				  {:type "inline-fields"	//used to create several form controls in one row, in horizontal forms
+                  {:type "inline-fields"	;;used to create several form controls in one row, in horizontal forms
                    :name "birthday"
                    :label "Birthday"
                    :columns [{:name "birthday-day"
