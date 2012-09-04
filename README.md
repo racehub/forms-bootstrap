@@ -8,14 +8,14 @@ You can use forms-bootstrap to quickly make nicely styled forms for your web app
 your forms and display well formatted error messages next to the appropriate fields. You can also pre-populate 
 the form with default data from a source of your choice.
 
-Forms-Bootstrap uses Twitter Bootstrap Version: 2.1
-
 ## Usage ##
 Forms-Bootstrap is hosted on Clojars. Add
 
 	[forms-bootstrap "0.2.0-SNAPSHOT"]
 
 to your project.clj.
+
+Forms-Bootstrap uses Twitter Bootstrap Version 2.1. Make sure to download [Bootstrap CSS 2.1](http://twitter.github.com/bootstrap/) and add it to your HTML files!
 
 ## Supported Form Controls / Styles ##
 Forms-Bootstrap currently supports all the form controls and form styles listed on 
