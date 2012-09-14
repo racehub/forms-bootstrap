@@ -29,7 +29,7 @@
 (defpage "/make-form" []
   (test-layout {:form-tests
                 [[(make-form
-                   :action "someaction"
+                   :action "/someaction"
                    :submit-label "Send it!"
                    :cancel-link "/"
                    :fields [{:type "text"
@@ -58,7 +58,7 @@
                              :inputs [["honda" "Honda"]
                                       ["toyota" "Toyota"]
                                       ["chevy" "Chevy"]]}
-                            {:type "checkbox" :name "languages" :label "Languages"
+                            {:type "checkbox" :name "languages[]" :label "Languages"
                              :inputs [["german" "German"]
                                       ["french" "French"]
                                       ["english" "English"]]}
@@ -67,6 +67,10 @@
                              :label "Choose a pic"}])
                   "Example One"
                   "How to use make-form"]]}))
+
+(defpage [:post "/someaction"] {:as m}
+  (println "Heres your form map, do with it as you please: " m)
+  (response/redirect "/"))
 
 (defn email-valid?
   [{:keys [email] :as m}]
@@ -92,7 +96,7 @@
                        :type "text"}
                       {:name "gender"
                        :label "Gender" 
-                       :type "radio inline"
+                       :type "radio"
                        :inputs [["male" "Male"]
                                 ["female" "Female"]]}
                       {:name "options"
@@ -143,6 +147,8 @@
                        :type "password"}]
              :on-success (fn [{uname :username :as user-map}]
                            ;;on success actions here
+                           (println "Successful validation. Your form
+                           map: " user-map)
                            (response/redirect "/"))
              :on-failure (fn [form-data]
                            ;;some failure action here
@@ -157,7 +163,7 @@
 (defpage "/form-helper"
   {:as m}
   (fn [req]
-   ;; (println "Request map: " req)
+    ;; (println "Request map: " req)
     (test-layout
      {:form-tests
       [[(helper-example m "form-helper" "/")

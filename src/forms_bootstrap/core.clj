@@ -258,8 +258,8 @@
 
 ;;HELPERS
 (defn make-field-helper
-  [form-class class-str field field-lite m]
-  (if (string-contains? form-class class-str)
+  [form-class field field-lite m]
+  (if (string-contains? form-class "form-inline")
     (list (field-lite m) " ")
     (field m)))
 
@@ -271,16 +271,16 @@
   ['Incorrect username'] :default ''}"
   [form-class m]
   (case (first-word (:type m))
-    "text"       (make-field-helper form-class "form-inline"
+    "text"       (make-field-helper form-class
                                     input-field input-lite m)
     "password"   (input-field (dissoc m :default)) ;;dont keep on render
-    "text-area"  (make-field-helper form-class "form-inline"
+    "text-area"  (make-field-helper form-class 
                                     text-area-field text-area-lite m)
-    "select"     (make-field-helper form-class "form-inline"
+    "select"     (make-field-helper form-class
                                     select-field select-lite m)
-    "radio"      (make-field-helper form-class "form-inline"
+    "radio"      (make-field-helper form-class 
                                     checkbox-or-radio checkbox-or-radio-lite m) 
-    "checkbox"   (make-field-helper form-class "form-inline"
+    "checkbox"   (make-field-helper form-class
                                     checkbox-or-radio checkbox-or-radio-lite m)
     "inline-fields" (inline-fields m)
     "file-input" (file-input m)))
@@ -309,17 +309,17 @@
   [& {:keys [action class fields submit-label errors-and-defaults
              enctype cancel-link legend button-type] :as form-map
       :or {class "form-horizontal"}}]
-;;  (println "make-form input map: " form-map "\n")
+;;    (println "make-form input map: " form-map "\n")
   (basic-form {:action action
                :legend legend
                :class class
                :enctype  enctype
-               :fields   (map (fn [{:keys [name type] :as m}]
+               :fields   (map (fn [{:keys [name type] :as a-field}]
                                 (make-field
                                  class
-                                 (merge m
+                                 (merge a-field
                                         (if (string-contains? type "inline-fields")
-                                          (inline-errs-defs m errors-and-defaults)
+                                          (inline-errs-defs a-field errors-and-defaults)
                                           (get errors-and-defaults
                                                (keyword
                                                 ;;replace [] in case its
@@ -344,25 +344,54 @@
 (defn move-errors-to-noir
   "Moves errors from sandbar to Noir and returns the form-data."
   [form-data errors]
-  (println "sandbar errors (move-errors-to-noir): " errors "\n")
+  (println "(FBS) Post request failed validation! Sandbar errors (moving to noir): "
+           errors "\n")
   (doseq [[field [error]] errors]
     (vali/set-error field error))
   form-data)
 
+(defn maybe-conj
+  "Gets a list containing one map or many maps. If theres only one map
+  in it, return the map. Else, return all the maps in the list conj-ed
+  together."
+  [a]
+  (if (> (count a) 1)
+    (apply conj a)
+    (first a)))
+
+;;The fn below is used called by the form-helper macro when a 'form
+;;function' is called, ie in a defpage, ex: (myform m "action" "/").
+;;It takes in the params map m and generates a map of default
+;;values. It then takes in all the validation errors in noir and
+;;generates a map of errors. We cant just call (vali/on-error) for
+;;each key in the map bc, for example, if the user submits a checkbox
+;;or radio with NO value (empty), then it is completely left out of
+;;the params map, yet might have a "cannot be nil" error in Noir. So
+;;we make the default map, the errors map, and then merge them.
+
 (defn create-errors-defaults-map
-  "Used when a page is rendered again, typically due to a validation
-  error. Also used to pass in data to prepoluate a form. It takes in
-  the form params map and returns it with the form elements
-  as keys and values such as {:errors ['error mesage'] :default
-  'default message here'} for each key."
+  "Used when a 'form fn' is called, either during the first time a
+  form is loaded or on a render due to a validation error.  It takes
+  in a map (which could be a post request map or a map of default
+  values) and returns it with the form elements as keys and a values
+  map with defaults and errors from Noir. Ex: {:somekey {:errors
+  ['error mesage'] :default 'default message here'}"
   [m]
-;;  (println "form params (from errors/defaults): " m "\n")
-;;Idea: Instead of going through [[k v] m], go through all the noir errors
-  ;;and match them with keywords in form params (adding as necesary?)
-  
-  (into {} (for [[k v] m]
-             [(keyword k) {:errors (vali/on-error (keyword k) identity)
-                           :default v}]))) 
+  ;;  (println "(FBS) Making form. All Noir errors: " @vali/*errors*)
+  ;;  (println "(FBS) Making form. Form Params: " m)
+  (let [defaults (if (seq m)
+                   (maybe-conj
+                    (map (fn[[k v]] {k {:errors nil :default v}}) m))
+                   {})
+        errors (if (seq @vali/*errors*)
+                 (maybe-conj
+                  (map (fn[[k v]] {k {:errors v :default ""}}) @vali/*errors*))
+                 {})
+        errs-defs  (merge-with
+                    (fn[a b] {:errors (:errors b) :default (:default a)})
+                    defaults errors)]
+    (println "(FBS) Making form. Computed errors / defaults map: " errs-defs)
+    errs-defs))
     
 ;;Takes a validator function, an url (route) to POST to, a sequence of
 ;;maps each containing a form element's attributes, a submit label for
