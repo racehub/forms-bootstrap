@@ -72,19 +72,22 @@
 (defsnippet input-lite
   form-template
   [:div.input-field :input]
-  [{:keys [id hidden name label class type size errors default disabled placeholder] 
-    :or {size "input-large"
-         type "text"
+  [{:keys [id hidden name label class type size errors default
+           disabled placeholder value onclick] 
+    :or {size "input-large"         
          default ""}}]
   [:input] (do->
-            (set-attr :name name)
+            (set-attr :name name)            
             (set-attr :type type)
             (set-attr :class size)
             (set-attr :placeholder placeholder)
+            (set-attr :value value)
+            (if (seq onclick)
+              (set-attr :onclick onclick)
+              identity)
             (if (= disabled true)
               (set-attr :disabled "")
               identity)
-            (set-attr :value default)
             (add-class class)))
 
 (defsnippet input-field
@@ -273,7 +276,10 @@
   (case (first-word (:type m))
     "text"       (make-field-helper form-class
                                     input-field input-lite m)
-    "password"   (input-field (dissoc m :default)) ;;dont keep on render
+    "password"   (input-field (dissoc m :default)) ;;dont keep on
+    ;;render
+    "button" (make-field-helper form-class
+                                input-field input-lite m)
     "text-area"  (make-field-helper form-class 
                                     text-area-field text-area-lite m)
     "select"     (make-field-helper form-class

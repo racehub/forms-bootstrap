@@ -46,6 +46,12 @@
                             {:type "text-area"
                              :name "description"
                              :label "Favorite Quote"}
+                            ;;<input value="Add Exercise" onclick="add('time')" class="btn" type="button">
+                            {:type "button"
+                             :class "btn"
+                             :name "abutton" 
+                             :onclick "add('something')"
+                             :value "Do something!"}
                             {:type "select"
                              :name "colors"
                              :label "Favorite Color"
@@ -94,6 +100,11 @@
                        name field. You can fit more stuff like this."
                        :label "Last Name"
                        :type "text"}
+                      {:type "button"
+                       :class "btn"
+                       :name "abutton" 
+                       :onclick "add('something')"
+                       :value "Do something!"}
                       {:name "gender"
                        :label "Gender" 
                        :type "radio"
