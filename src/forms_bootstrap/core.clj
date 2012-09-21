@@ -389,7 +389,9 @@
   ;;  (println "(FBS) Making form. Form Params: " m)
   (let [defaults (if (seq m)
                    (maybe-conj
-                    (map (fn[[k v]] {k {:errors nil :default v}}) m))
+                    (map (fn[[k v]] {k {:errors nil :default (if (coll? v)
+                                                              (map str v)
+                                                              (str v))}}) m))
                    {})
         errors (if (seq @vali/*errors*)
                  (maybe-conj

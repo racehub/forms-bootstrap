@@ -173,10 +173,13 @@
 ;;database or some other data source to prepopulate your form.
 (defpage "/form-helper"
   {:as m}
+  (println "form-helper m: " m)
   (fn [req]
     ;; (println "Request map: " req)
-    (test-layout
-     {:form-tests
-      [[(helper-example m "form-helper" "/")
-        "Form-helper Example"
-        "Uses the form-helper macro for easy validation."]]})))
+    (let [default-values {:username "zoey" :birthday-day 12 :gender "male" :first-name 12345
+                          :colors ["red" "blue"]}]
+      (test-layout
+       {:form-tests
+        [[(helper-example (or (when (seq m) m) default-values) "form-helper" "/")
+          "Form-helper Example"
+          "Uses the form-helper macro for easy validation."]]}))))
