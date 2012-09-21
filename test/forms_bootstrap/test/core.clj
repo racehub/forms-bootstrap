@@ -173,7 +173,7 @@
 ;;database or some other data source to prepopulate your form.
 (defpage "/form-helper"
   {:as m}
-  (println "form-helper m: " m)
+;;  (println "form-helper m: " m)
   (fn [req]
     ;; (println "Request map: " req)
     (let [default-values {:username "zoey" :birthday-day 12 :gender "male" :first-name 12345
