@@ -5,6 +5,7 @@
         noir.core
         net.cgrand.enlive-html)
   (:require [noir.response :as response]
+            [noir.session :as session]
             [sandbar.validation :as v]))
 
 (def test-template "forms_bootstrap/test/test-page.html")
@@ -89,7 +90,7 @@
                                            (v/non-empty-string :last-name)
                                            (v/non-nil :gender)
                                            (email-valid?))
-             :post-url "/form-helper"
+             :post-url "/some-post-url"
              :submit-label "Sign Up!"
              :fields [{:name "first-name"
                        :label "First Name"
@@ -163,7 +164,7 @@
                            (response/redirect "/"))
              :on-failure (fn [form-data]
                            ;;some failure action here
-                           (render "/form-helper" form-data)))
+                           (response/redirect "/form-helper")))
 
 ;;This example shows how to access the entire request map. Typically
 ;;we just use 'm' from below, which is just the form params portion of
@@ -173,13 +174,14 @@
 ;;database or some other data source to prepopulate your form.
 (defpage "/form-helper"
   {:as m}
-;;  (println "form-helper m: " m)
+ ;; (println "form-helper m: " m)
+  (println "flash: " (session/flash-get :form-data)) 
   (fn [req]
-    ;; (println "Request map: " req)
+  ;;   (println "Request map: " req)
     (let [default-values {:username "zoey" :birthday-day 12 :gender "male" :first-name 12345
                           :colors ["red" "blue"]}]
       (test-layout
        {:form-tests
-        [[(helper-example (or (when (seq m) m) default-values) "form-helper" "/")
+        [[(helper-example default-values "some-post-url" "/")
           "Form-helper Example"
           "Uses the form-helper macro for easy validation."]]}))))

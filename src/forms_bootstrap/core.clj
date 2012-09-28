@@ -62,7 +62,7 @@
                            fields
                            (list {:tag "legend" 
                                   :content legend}
-                                 fields)))   
+                                 fields)))
                 (append submitter)))
 
 ;; Generates a txt or password input form field for a given map.
@@ -349,6 +349,7 @@
 ;;  [["location cannot be blank!"]]}
 ;; 'errors' are the sandbar :_validation-errors from the result of validating
 ;;  the form map.
+;; WE DONT DO THIS ANYMORE
 (defn move-errors-to-noir
   "Moves errors from sandbar to Noir and returns the form-data."
   [form-data errors]
@@ -356,7 +357,15 @@
            errors "\n")
   (doseq [[field [error]] errors]
     (vali/set-error field error))
-  form-data)
+  (assoc form-data :_sandbar-errors errors))
+
+(defn move-errors-to-flash
+  "Moves the errors from sandbar validation and any form-data (values
+  that were just submitted) over to the flash to be used when we
+  redirect to the form page again."
+  [form-data errors]
+  (session/flash-put! :form-data (assoc form-data
+                                   :_sandbar-errors errors)))
 
 (defn maybe-conj
   "Gets a list containing one map or many maps. If theres only one map
@@ -384,22 +393,29 @@
   values) and returns it with the form elements as keys and a values
   map with defaults and errors from Noir. Ex: {:somekey {:errors
   ['error mesage'] :default 'default message here'}"
-  [m]
+  [default-values]
   ;;  (println "(FBS) Making form. All Noir errors: " @vali/*errors*)
   ;;  (println "(FBS) Making form. Form Params: " m)
-  (let [defaults (if (seq m)
+  (let [flash-data (session/flash-get :form-data)
+        flash-errors (:_sandbar-errors flash-data)
+        m (if (seq flash-data)
+            (dissoc flash-data :_sandbar-errors)
+            default-values)
+        defaults (if (seq m)
                    (maybe-conj
                     (map (fn[[k v]] {k {:errors nil :default (if (coll? v)
                                                               (map str v)
                                                               (str v))}}) m))
                    {})
-        errors (if (seq @vali/*errors*)
+        errors (if (seq flash-errors)
                  (maybe-conj
-                  (map (fn[[k v]] {k {:errors v :default ""}}) @vali/*errors*))
+                  (map (fn[[k v]] {k {:errors v :default ""}}) flash-errors))
                  {})
         errs-defs  (merge-with
                     (fn[a b] {:errors (:errors b) :default (:default a)})
                     defaults errors)]
+    ;;    (println "(FBS) Noir ERRORS: " @vali/*errors*)
+    ;;    (println "(FBS) Sandbar ERRORS: " (:_sandbar-errors form-map))
     (println "(FBS) Making form. Computed errors / defaults map: " errs-defs)
     errs-defs))
     
@@ -427,4 +443,4 @@
      (defpage [:post ~post-url] {:as m#}
        (if-valid ~validator m#
                  ~on-success
-                 (comp ~on-failure move-errors-to-noir)))))
+                 (comp ~on-failure move-errors-to-flash)))))
