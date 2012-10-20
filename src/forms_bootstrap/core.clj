@@ -187,7 +187,7 @@
                                                :name name
                                                :value value
                                                :id (remove-spaces
-                                                    value-label))
+                                                    value))
                                      (content value-label)
                                      (if (contains?
                                           (set (collectify default))
