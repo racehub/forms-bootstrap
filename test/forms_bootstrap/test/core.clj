@@ -27,12 +27,36 @@
                 [["/make-form" "Make-Form Example"]
                  ["/form-helper" "Form-Helper Example"]]})) 
 
+;;you can use make-form in conjunction with
+;;create-errors-defaults-map and post-helper.
+
+;;Create-errors-defaults-map will populate fields in the form (on the
+;;first page load) with the map that you give it. It can handle
+;;checkboxes with multiple values too, just pass in the values in a collection.
+
+;;Use post-helper to help with validation / form submission. Just pass
+;;it an on-success and an on-failure fn, just like w. form-helper. If
+;;the form fails validation, it will move all the errors over to the
+;;flash, and reloads the page. Now create-errors-defaults-map can
+;;access the form-data from the last submit and any errors since they
+;;are now in the flash. Make the returned map the value to
+;;:errors-and-defaults for make-form, and it will show the defaults
+;;and errors in the form.
+
 (defpage "/make-form" []
   (test-layout {:form-tests
                 [[(make-form
                    :action "/someaction"
                    :submit-label "Send it!"
                    :cancel-link "/"
+                   :errors-and-defaults (create-errors-defaults-map
+                                         {:city "SomeDefault"
+                                          :description
+                                          "These can come from a db or
+                                          some other stateful place."
+                                          :car "honda"
+                                          :languages ["german" "french"]
+                                          :color "red"})
                    :fields [{:type "text"
                              :name "nickname"
                              :label "Nick Name"
@@ -54,13 +78,13 @@
                              :onclick "add('something')"
                              :value "Do something!"}
                             {:type "select"
-                             :name "colors"
+                             :name "color"
                              :label "Favorite Color"
                              :inputs [["blue" "Blue"]
                                       ["red" "Red"]
                                       ["yellow" "Yellow"]]}
                             {:type "radio"
-                             :name "cars"
+                             :name "car"
                              :label "Favorite Car"
                              :inputs [["honda" "Honda"]
                                       ["toyota" "Toyota"]
@@ -77,9 +101,18 @@
                   "Example One"
                   "How to use make-form"]]}))
 
-(defpage [:post "/someaction"] {:as m}
-  (println "Heres your form map, do with it as you please: " m)
-  (response/redirect "/"))
+(post-helper :post-url "/someaction"
+             :validator (v/build-validator (v/non-empty-string :nickname))
+             :on-success (fn [m]
+                           ;;on success actions here
+                           (println "Successful validation. Your form
+                           map: " m)
+                           (response/redirect "/"))
+             :on-failure (fn [m]
+                           ;;on success actions here
+                           (println "Failed validation. Your form
+                           map: " m)
+                           (response/redirect "/make-form"))) 
 
 (defn email-valid?
   [{:keys [email] :as m}]
@@ -87,6 +120,7 @@
     (v/add-validation-error m :email "Your email cannot be 'blah'!")
     m))
 
+;;Form Helper Example
 (form-helper helper-example
              :validator (v/build-validator (v/non-empty-string :first-name)
                                            (v/non-empty-string :last-name)

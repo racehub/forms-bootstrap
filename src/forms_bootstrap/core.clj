@@ -182,7 +182,7 @@
                       [:label] (do-> (set-attr :class type)
                                      (if (string-contains? type "inline")
                                        (add-class "inline")
-                                       identity)) 
+                                       identity))
                       [:input] (do-> (set-attr :type (first-word type)
                                                :name name
                                                :value value
@@ -291,7 +291,7 @@
                                     checkbox-or-radio checkbox-or-radio-lite m) 
     "checkbox"   (make-field-helper form-class
                                     checkbox-or-radio checkbox-or-radio-lite m)
-    "inline-fields" (inline-fields m)
+    "inline-fields" (inline-fieldsfields m)
     "file-input" (file-input m)))
 
 (defn inline-errs-defs
@@ -363,10 +363,13 @@
 (defn move-errors-to-flash
   "Moves the errors from sandbar validation and any form-data (values
   that were just submitted) over to the flash to be used when we
-  redirect to the form page again."
+  redirect to the form page again. Returns the form data with the sandbar errors."
   [form-data errors]
-  (session/flash-put! :form-data (assoc form-data
-                                   :_sandbar-errors errors)))
+  (let [form-with-errors (assoc form-data
+                           :_sandbar-errors errors)]
+    (do
+      (session/flash-put! :form-data form-with-errors)
+      form-with-errors)))
 
 (defn maybe-conj
   "Gets a list containing one map or many maps. If theres only one map
@@ -379,21 +382,22 @@
 
 ;;The fn below is used called by the form-helper macro when a 'form
 ;;function' is called, ie in a defpage, ex: (myform m "action" "/").
-;;It takes in the params map m and generates a map of default
-;;values. It then takes in all the validation errors in noir and
-;;generates a map of errors. We cant just call (vali/on-error) for
-;;each key in the map bc, for example, if the user submits a checkbox
-;;or radio with NO value (empty), then it is completely left out of
-;;the params map, yet might have a "cannot be nil" error in Noir. So
-;;we make the default map, the errors map, and then merge them.
+;;It takes in the map of defaults, and checks to see if there is any
+;;form-data in the flash (which signifies a failed validation
+;;attempt). If there is no flash data, that means its loading the form
+;;for the first time, and thus just uses the given defaults. If there
+;;is form-data in the flash, then it uses the form params from there
+;;and the errors that have been placed in there (by
+;;move-errors-to-flash) and generates a map of default
+;;and errors suitable for use by make-form.
 
 (defn create-errors-defaults-map
   "Used when a 'form fn' is called, either during the first time a
   form is loaded or on a render due to a validation error.  It takes
-  in a map (which could be a post request map or a map of default
-  values) and returns it with the form elements as keys and a values
-  map with defaults and errors from Noir. Ex: {:somekey {:errors
-  ['error mesage'] :default 'default message here'}"
+  in a map of default values (which could be empty) and returns a map
+  with the form elements as keys, each paired with a map containing
+  defaults and errors from validation. Ex: {:somekey {:errors ['error
+  mesage'] :default 'default message here'}"
   [default-values]
   ;;  (println "(FBS) Making form. All Noir errors: " @vali/*errors*)
   ;;  (println "(FBS) Making form. Form Params: " m)
@@ -434,8 +438,17 @@
           "Please provide :post-url, :fields, and :on-failure to defform.")
   `(do
      (defn ~sym
-       ([form-params# action# cancel-link#]
-          (->> (create-errors-defaults-map form-params#)
+       ([defaults# action# cancel-link#]
+          (->> (create-errors-defaults-map defaults#) 
+               ;;defaults are values that can be passed in from
+               ;;something like a db. 
+               ;;really getting form params anymore, but default
+               ;;inputs. If you submitted a form with data, and it
+               ;;failed validation, everything has already been placed
+               ;;in the flash in
+               ;;move-errors-to-flash. Create-errors-defaults-map
+               ;;can access values from the flash and make a field
+               ;;that is suitable to be passed to make-form
                (assoc (-> (assoc ~opts :action action#)
                           (assoc :cancel-link cancel-link#))
                  :errors-and-defaults)
@@ -445,3 +458,13 @@
        (if-valid ~validator m#
                  ~on-success
                  (comp ~on-failure move-errors-to-flash)))))
+
+;;Can Use post-helper with make-form when you don't have enough info to use
+;;form-helper.
+(defmacro post-helper
+  [& {:keys [post-url validator on-success on-failure]}]
+  `(defpage [:post ~post-url] {:as m#}
+     (println "post-helper map: " m#)
+     (if-valid ~validator m#
+               ~on-success
+               (comp ~on-failure move-errors-to-flash))))
