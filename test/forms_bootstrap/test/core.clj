@@ -1,4 +1,4 @@
-(ns forms-bootstrap.test.core
+(ns forms-bootstrap.test.core 
   (:use forms-bootstrap.core
         clojure.test
         forms-bootstrap.util
@@ -65,7 +65,9 @@
                              :inputs [["honda" "Honda"]
                                       ["toyota" "Toyota"]
                                       ["chevy" "Chevy"]]}
-                            {:type "checkbox" :name "languages[]" :label "Languages"
+                            {:type "checkbox"
+                             :name "languages[]"
+                             :label "Languages"
                              :inputs [["german" "German"]
                                       ["french" "French"]
                                       ["english" "English"]]}

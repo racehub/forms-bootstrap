@@ -179,10 +179,10 @@
   [:div.checkbox-or-radio :div.controls :label]
   [{:keys [name inputs type errors default]}]
   [:label] (clone-for [[value value-label] inputs] 
-                      [:label] (do-> (add-class type)
+                      [:label] (do-> (set-attr :class type)
                                      (if (string-contains? type "inline")
                                        (add-class "inline")
-                                       identity))
+                                       identity)) 
                       [:input] (do-> (set-attr :type (first-word type)
                                                :name name
                                                :value value
@@ -199,12 +199,13 @@
   form-template                       
   [:.checkbox-or-radio] 
   [{:keys [class name label inputs errors help-inline help-block] :as m}]
-  [:div.checkbox-or-radio]  (add-class class) ;;'checkbox' or 'radio'
-  [:div.checkbox-or-radio] (handle-error-css errors)
+  [:div.checkbox-or-radio]  (do->
+                             (add-class class) ;;'checkbox' or 'radio'
+                             (handle-error-css errors))
   [:label.control-label] (do-> (content label)  
                                (set-attr :name name))
-  [:div.controls :label] (content
-                          (checkbox-or-radio-lite m))
+  [:div.controls] (content
+                   (checkbox-or-radio-lite m))
   [:div.controls] (add-spans errors help-inline help-block))
    
 ;;Creates a file input button
