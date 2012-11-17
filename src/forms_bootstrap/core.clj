@@ -380,6 +380,20 @@
     (apply conj a)
     (first a)))
 
+(defn contains-keys?
+  "Like contains? but you pass in a collection of as many keys as you
+  want, only returns true if m contains ALL the given keys."
+  [m ks]
+  (if (next ks)
+    (and (contains? m (first ks))
+         (contains-keys? m (rest ks)))
+    (contains? m (first ks))))
+
+(defn file-input?
+  "Checks to see if a given form param is for a file input."
+  [m]
+  (contains-keys? m [:size :content-type :tempfile :filename]))
+
 ;;The fn below is used called by the form-helper macro when a 'form
 ;;function' is called, ie in a defpage, ex: (myform m "action" "/").
 ;;It takes in the map of defaults, and checks to see if there is any
@@ -409,7 +423,9 @@
         defaults (if (seq m)
                    (maybe-conj
                     (map (fn[[k v]] {k {:errors nil :default (if (coll? v)
-                                                              (map str v)
+                                                              (if (file-input? v)
+                                                                nil
+                                                                (map str v))
                                                               (str v))}}) m))
                    {})
         errors (if (seq flash-errors)
@@ -464,7 +480,7 @@
 (defmacro post-helper
   [& {:keys [post-url validator on-success on-failure]}]
   `(defpage [:post ~post-url] {:as m#}
-     (println "post-helper map: " m#)
+;;     (println "post-helper map: " m#)
      (if-valid ~validator m#
                ~on-success
                (comp ~on-failure move-errors-to-flash))))

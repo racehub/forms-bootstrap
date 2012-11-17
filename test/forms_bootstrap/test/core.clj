@@ -100,10 +100,7 @@
                              :label "Languages"
                              :inputs [["german" "German"]
                                       ["french" "French"]
-                                      ["english" "English"]]}
-                            {:type "file-input"
-                             :name "afile"
-                             :label "Choose a pic"}])
+                                      ["english" "English"]]}])
                   "Example One"
                   "How to use make-form"]]}))
 
@@ -134,6 +131,7 @@
                                            (email-valid?))
              :post-url "/some-post-url"
              :submit-label "Sign Up!"
+             :enctype "multipart/form-data"
              :fields [{:name "first-name"
                        :label "First Name"
                        :help-inline "This is 'help-inline' for the first name field."
@@ -193,6 +191,9 @@
                                 ["yellow" "Yellow"]
                                 ["green" "Green"]]
                        :note "Pick 2 of the above colors!"}
+                      {:type "file-input"
+                       :name "pic"
+                       :label "Choose a pic"}
                       {:name "username"
                        :label "Username"
                        :type "text"}
@@ -217,7 +218,7 @@
 (defpage "/form-helper"
   {:as m}
  ;; (println "form-helper m: " m)
-  (println "flash: " (session/flash-get :form-data)) 
+;;  (println "flash: " (session/flash-get :form-data)) 
   (fn [req]
   ;;   (println "Request map: " req)
     (let [default-values {:username "zoey" :birthday-day 12 :gender "male" :first-name 12345
