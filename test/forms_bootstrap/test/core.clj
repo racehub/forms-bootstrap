@@ -49,11 +49,17 @@
                    :action "/someaction"
                    :submit-label "Send it!"
                    :cancel-link "/"
+                   ;;you can pass in any defaults here that you want
+                   ;;to preopulate the form with.
+                   ;;If you use the post-helper macro (see below),
+                   ;;then form validation errors will be stored in the
+                   ;;flash for you, and create-errors-defaults-map
+                   ;;will grab those and transform them into a format
+                   ;;which make-form can use for display.
                    :errors-and-defaults (create-errors-defaults-map
                                          {:city "SomeDefault"
                                           :description
-                                          "These can come from a db or
-                                          some other stateful place."
+                                          "These can come from a db or another stateful place."
                                           :car "honda"
                                           :languages ["german" "french"]
                                           :color "red"})

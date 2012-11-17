@@ -291,7 +291,7 @@
                                     checkbox-or-radio checkbox-or-radio-lite m) 
     "checkbox"   (make-field-helper form-class
                                     checkbox-or-radio checkbox-or-radio-lite m)
-    "inline-fields" (inline-fieldsfields m)
+    "inline-fields" (inline-fields m)
     "file-input" (file-input m)))
 
 (defn inline-errs-defs
