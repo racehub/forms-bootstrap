@@ -48,7 +48,7 @@
                 [[(make-form
                    :action "/someaction"
                    :submit-label "Send it!"
-                   :cancel-link "/"
+                   :cancel-link "/" 
                    ;;you can pass in any defaults here that you want
                    ;;to preopulate the form with.
                    ;;If you use the post-helper macro (see below),
@@ -68,8 +68,11 @@
                              :label "Nick Name"
                              :size "input-large"}
                             {:type "password"
-                             :name "password"
+                             :name "password" 
                              :label "Password"}
+                            {:type "hidden"
+                             :name "myhiddenfield"
+                             :value "hiddenvalue"}
                             {:type "text"
                              :name "city"
                              :label "City"
@@ -81,7 +84,7 @@
                             {:type "button"
                              :class "btn"
                              :name "abutton" 
-                             :onclick "add('something')"
+                             :onclick "add('something')" 
                              :value "Do something!"}
                             {:type "select"
                              :name "color"
@@ -96,8 +99,8 @@
                                       ["toyota" "Toyota"]
                                       ["chevy" "Chevy"]]}
                             {:type "checkbox"
-                             :name "languages[]"
-                             :label "Languages"
+                             :name "languages[]" 
+                             :label "Languages" 
                              :inputs [["german" "German"]
                                       ["french" "French"]
                                       ["english" "English"]]}])
