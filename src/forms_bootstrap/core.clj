@@ -51,10 +51,12 @@
 (defsnippet basic-form  
   form-template        
   [:form]              
-  [{:keys [action fields submitter class enctype legend]
-    :or {class "form-horizontal"}}]
+  [{:keys [action fields submitter class enctype legend method]
+    :or {class "form-horizontal"
+         method "post"}}]
   [:form] (do-> (set-attr :action action
-                          :class class)
+                          :class class
+                          :method method)
                 (if (seq enctype)
                   (set-attr :enctype enctype)
                   identity)
@@ -87,6 +89,20 @@
             (if (seq onclick)
               (set-attr :onclick onclick)
               identity)
+            (if (= disabled true)
+              (set-attr :disabled "")
+              identity)
+            (add-class class)))
+
+;;Creates a hidden input field
+(defsnippet hidden-input
+  form-template
+  [:div.hidden-field :input]
+  [{:keys [id class hidden name errors default disabled value] 
+    :or {size "input-large"         
+         default ""}}]
+  [:input] (do->
+            (set-attr :name name)            
             (if (= disabled true)
               (set-attr :disabled "")
               identity)
@@ -407,7 +423,7 @@
 
 (defn create-errors-defaults-map
   "Used when a 'form fn' is called, either during the first time a
-  form is loaded or on a render due to a validation error.  It takes
+  form is loaded or on a reload due to a validation error.  It takes
   in a map of default values (which could be empty) and returns a map
   with the form elements as keys, each paired with a map containing
   defaults and errors from validation. Ex: {:somekey {:errors ['error
@@ -451,20 +467,18 @@
                validator  identity}
           :as opts}] 
   (assert (and post-url fields on-success on-failure)
-          "Please provide :post-url, :fields, and :on-failure to defform.")
+          "Please provide :post-url, :fields, and :on-failure to form-helper.")
   `(do
      (defn ~sym
        ([defaults# action# cancel-link#]
           (->> (create-errors-defaults-map defaults#) 
                ;;defaults are values that can be passed in from
-               ;;something like a db. 
-               ;;really getting form params anymore, but default
-               ;;inputs. If you submitted a form with data, and it
-               ;;failed validation, everything has already been placed
-               ;;in the flash in
-               ;;move-errors-to-flash. Create-errors-defaults-map
-               ;;can access values from the flash and make a field
-               ;;that is suitable to be passed to make-form
+               ;;something like a db. If you submitted a form with
+               ;;data, and it failed validation, everything has
+               ;;already been placed in the flash in
+               ;;move-errors-to-flash. Create-errors-defaults-map can
+               ;;access values from the flash and make a field that is
+               ;;suitable to be passed to make-form
                (assoc (-> (assoc ~opts :action action#)
                           (assoc :cancel-link cancel-link#))
                  :errors-and-defaults)
