@@ -310,6 +310,7 @@
     "checkbox"   (make-field-helper form-class
                                     checkbox-or-radio checkbox-or-radio-lite m)
     "inline-fields" (inline-fields m)
+    "custom" (:html-nodes m)
     "file-input" (file-input m)))
 
 (defn inline-errs-defs
@@ -337,7 +338,7 @@
              enctype cancel-link legend button-type method] :as form-map
       :or {class "form-horizontal"
            method "post"}}] 
-;;    (println "make-form input map: " form-map "\n")
+  ;;    (println "make-form input map: " form-map "\n")
   (basic-form {:action action 
                :legend legend
                :method method
@@ -349,13 +350,15 @@
                                  (merge a-field
                                         (if (string-contains? type "inline-fields")
                                           (inline-errs-defs a-field errors-and-defaults)
-                                          (get errors-and-defaults
-                                               (keyword
-                                                ;;replace [] in case its
-                                                ;;the name of a form
-                                                ;;element that can take
-                                                ;;on mutliple values (ie checkbox)
-                                                (string/replace name "[]" "")))))))
+                                          (if (not (= type "custom"))
+                                            (get errors-and-defaults
+                                                 (keyword
+                                                  ;;replace [] in case its
+                                                  ;;the name of a form
+                                                  ;;element that can take
+                                                  ;;on mutliple values (ie checkbox)
+                                                  (string/replace name "[]" "")))
+                                            {})))))
                               fields) 
                :submitter (if (string-contains? class "form-inline")
                             (button-lite submit-label button-type)

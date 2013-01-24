@@ -67,6 +67,14 @@
                              :name "nickname"
                              :label "Nick Name"
                              :size "input-large"}
+                            {:type "custom"
+                             :html-nodes [{:tag :p
+                                           :content
+                                           "Some content you might want to put into your form, but not a standard form field."}]}
+                            {:type "checkbox"
+                             :name "waiver" 
+                             :label "Waiver" 
+                             :inputs [["checked" "I agree"]]}
                             {:type "password"
                              :name "password" 
                              :label "Password"}
@@ -164,6 +172,10 @@
                        :name "abutton" 
                        :onclick "add('something')"
                        :value "Do something!"}
+                      {:type "custom"
+                       :html-nodes [{:tag :p
+                                     :content
+                                     "Some content you might want to put into your form, but not a standard form field."}]}                      
                       {:name "gender"
                        :label "Gender" 
                        :type "radio"
