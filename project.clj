@@ -1,4 +1,4 @@
-(defproject forms-bootstrap "0.4.3-SNAPSHOT"
+(defproject forms-bootstrap "0.4.4-SNAPSHOT"
   :description "Utility for creating web forms using Twitter's Bootstrap CSS"
   :url "https://github.com/dpetrovics/forms-bootstrap"
   :dependencies [[org.clojure/clojure "1.4.0"]
