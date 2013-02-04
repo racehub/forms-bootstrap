@@ -1,4 +1,4 @@
-(ns forms-bootstrap.test.core 
+(ns forms-bootstrap.test.core
   (:use forms-bootstrap.core
         clojure.test
         forms-bootstrap.util
@@ -21,11 +21,11 @@
                                                 (str header " <small>" descr "</small"))
                         [:div.formhere] (content form-test)))
 
-;;This first example uses the make-form function 
-(defpage "/" [] 
+;;This first example uses the make-form function
+(defpage "/" []
   (test-layout {:links
                 [["/make-form" "Make-Form Example"]
-                 ["/form-helper" "Form-Helper Example"]]})) 
+                 ["/form-helper" "Form-Helper Example"]]}))
 
 ;;you can use make-form in conjunction with
 ;;create-errors-defaults-map and post-helper.
@@ -48,7 +48,7 @@
                 [[(make-form
                    :action "/someaction"
                    :submit-label "Send it!"
-                   :cancel-link "/" 
+                   :cancel-link "/"
                    ;;you can pass in any defaults here that you want
                    ;;to preopulate the form with.
                    ;;If you use the post-helper macro (see below),
@@ -57,7 +57,7 @@
                    ;;will grab those and transform them into a format
                    ;;which make-form can use for display.
                    :errors-and-defaults (create-errors-defaults-map
-                                         {:city "SomeDefault"
+                                         {:city "Something"
                                           :description
                                           "These can come from a db or another stateful place."
                                           :car "honda"
@@ -72,11 +72,11 @@
                                            :content
                                            "Some content you might want to put into your form, but not a standard form field."}]}
                             {:type "checkbox"
-                             :name "waiver" 
-                             :label "Waiver" 
+                             :name "waiver"
+                             :label "Waiver"
                              :inputs [["checked" "I agree"]]}
                             {:type "password"
-                             :name "password" 
+                             :name "password"
                              :label "Password"}
                             {:type "hidden"
                              :name "myhiddenfield"
@@ -85,14 +85,36 @@
                              :name "city"
                              :label "City"
                              :placeholder "Placeholder!"}
+                            {:type "inline-fields"
+                             :name "myfields"
+                             :label "FieldsLabel"
+                             :columns [{:name "hiddenfield"
+                                        :type "hidden"
+                                        :value "123"}
+                                       {:name "firstthing"
+                                        :type "text"
+                                        :placeholder "A"}
+                                       {:type "button"
+                                        :class "btn"
+                                        :name "abutton"
+                                        :onclick "add('something')"
+                                        :value "Do something!"}
+                                       {:name "firstcustomthing"
+                                        :type "custom"
+                                        :html-nodes {:tag :p
+                                                     :attrs {:style "display:inline"}
+                                                     :content ["Sometext"]}}
+                                       {:name "secondthing"
+                                        :type "text"
+                                        :placeholder "B"}]}
                             {:type "text-area"
                              :name "description"
                              :label "Favorite Quote"}
                             ;;<input value="Add Exercise" onclick="add('time')" class="btn" type="button">
                             {:type "button"
                              :class "btn"
-                             :name "abutton" 
-                             :onclick "add('something')" 
+                             :name "abutton"
+                             :onclick "add('something')"
                              :value "Do something!"}
                             {:type "select"
                              :name "color"
@@ -107,8 +129,8 @@
                                       ["toyota" "Toyota"]
                                       ["chevy" "Chevy"]]}
                             {:type "checkbox"
-                             :name "languages[]" 
-                             :label "Languages" 
+                             :name "languages[]"
+                             :label "Languages"
                              :inputs [["german" "German"]
                                       ["french" "French"]
                                       ["english" "English"]]}])
@@ -126,7 +148,7 @@
                            ;;on success actions here
                            (println "Failed validation. Your form
                            map: " m)
-                           (response/redirect "/make-form"))) 
+                           (response/redirect "/make-form")))
 
 (defn email-valid?
   [{:keys [email] :as m}]
@@ -169,15 +191,15 @@
                        :type "text"}
                       {:type "button"
                        :class "btn"
-                       :name "abutton" 
+                       :name "abutton"
                        :onclick "add('something')"
                        :value "Do something!"}
                       {:type "custom"
                        :html-nodes [{:tag :p
                                      :content
-                                     "Some content you might want to put into your form, but not a standard form field."}]}                      
+                                     "Some content you might want to put into your form, but not a standard form field."}]}
                       {:name "gender"
-                       :label "Gender" 
+                       :label "Gender"
                        :type "radio"
                        :inputs [["male" "Male"]
                                 ["female" "Female"]]}
@@ -196,13 +218,13 @@
                        :label "Birthday"
                        :columns [{:name "birthday-day"
                                   :type "select"
-                                  :size "input-small" 
+                                  :size "input-small"
                                   :inputs (let [days (reduce #(conj %1 [(str %2) (str %2)])
                                                              [] (range 1 32))]
                                             (insert days 0 ["" "Day"]))}
                                  {:name "birthday-month"
                                   :type "select"
-                                  :size "input-small" 
+                                  :size "input-small"
                                   :inputs (let [days (reduce #(conj %1 [(str %2) (str %2)])
                                                              [] (range 1 13))]
                                             (insert days 0 ["" "Month"]))}
@@ -247,7 +269,7 @@
 (defpage "/form-helper"
   {:as m}
  ;; (println "form-helper m: " m)
-;;  (println "flash: " (session/flash-get :form-data)) 
+;;  (println "flash: " (session/flash-get :form-data))
   (fn [req]
   ;;   (println "Request map: " req)
     (let [default-values {:username "zoey" :birthday-day 12 :first-name 12345
@@ -276,11 +298,11 @@
                        :type "text"}
                       {:type "button"
                        :class "btn"
-                       :name "abutton" 
+                       :name "abutton"
                        :onclick "add('something')"
                        :value "Do something!"}
                       {:name "gender"
-                       :label "Gender" 
+                       :label "Gender"
                        :type "radio"
                        :inputs [["male" "Male"]
                                 ["female" "Female"]]}
@@ -299,13 +321,13 @@
                        :label "Birthday"
                        :columns [{:name "birthday-day"
                                   :type "select"
-                                  :size "input-small" 
+                                  :size "input-small"
                                   :inputs (let [days (reduce #(conj %1 [(str %2) (str %2)])
                                                              [] (range 1 32))]
                                             (insert days 0 ["" "Day"]))}
                                  {:name "birthday-month"
                                   :type "select"
-                                  :size "input-small" 
+                                  :size "input-small"
                                   :inputs (let [days (reduce #(conj %1 [(str %2) (str %2)])
                                                              [] (range 1 13))]
                                             (insert days 0 ["" "Month"]))}
@@ -353,5 +375,3 @@
       [[(helper-example-user default-values (str "/" user "/action") "/")
         "Form-helper Example"
         "Uses the form-helper macro for easy validation."]]})))
-
-
