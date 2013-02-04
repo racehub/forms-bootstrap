@@ -106,6 +106,7 @@
                                                      :content ["Sometext"]}}
                                        {:name "secondthing"
                                         :type "text"
+                                        :style "display: none;"
                                         :placeholder "B"}]}
                             {:type "text-area"
                              :name "description"

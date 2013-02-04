@@ -75,14 +75,11 @@
   form-template
   [:div.input-field :input]
   [{:keys [id hidden name label class type size errors default
-           disabled placeholder value onclick]
+           disabled placeholder value onclick style]
     :or {size "input-large"
          default ""}}]
   [:input] (do->
-            (set-attr :name name)
-            (set-attr :type type)
-            (set-attr :class size)
-            (set-attr :placeholder placeholder)
+            (set-attr :name name :type type :class size :style style :placeholder placeholder)
             (if (= type "button")
               (set-attr :value value)
               (set-attr :value default))
@@ -134,13 +131,11 @@
 (defsnippet text-area-lite
   form-template
   [:div.text-area :textarea]
-  [{:keys [name label size rows errors default class]
+  [{:keys [name label size rows errors default class style]
     :or {size "input-large"
          rows "3"
          default ""}}]
-  [:textarea] (do-> (set-attr :class size)
-                    (set-attr :name name)
-                    (set-attr :rows rows)
+  [:textarea] (do-> (set-attr :class size :style style :name name :rows rows)
                     (add-class class)
                     (content default)))
 
@@ -160,12 +155,10 @@
 (defsnippet select-lite
   form-template
   [:div.select-dropdown :select]
-  [{:keys [name size class label inputs custom-inputs errors default type]
+  [{:keys [name size style class label inputs custom-inputs errors default type]
     :or {size "input-large"}}]
   [:select] (do->
-             (set-attr :name name
-                       :id name
-                       :class size)
+             (set-attr :name name :id name :style style :class size)
              (add-class class)
              (if (string-contains? type "multiple")
                (set-attr :multiple "multiple")
@@ -206,7 +199,7 @@
 (defsnippet checkbox-or-radio-lite
   form-template
   [:div.checkbox-or-radio :div.controls :label]
-  [{:keys [name inputs custom-inputs type errors default]}]
+  [{:keys [name inputs custom-inputs type errors default style]}]
   [:label] (if custom-inputs
              (clone-for [[value-label {:keys [value] :as attrs}] custom-inputs]
                         [:label] (do-> (set-attr :class type)
@@ -217,6 +210,7 @@
                                   #(assoc % :attrs attrs)
                                   (set-attr :type (first-word type)
                                             :name name
+                                            :style style
                                             :id (remove-spaces
                                                  value))
                                   (content value-label)
@@ -232,6 +226,7 @@
                                          identity))
                         [:input] (do-> (set-attr :type (first-word type)
                                                  :name name
+                                                 :style style
                                                  :value value
                                                  :id (remove-spaces
                                                       value))
@@ -259,8 +254,8 @@
 (defsnippet file-input-lite
   form-template
   [:div.file-input :input]
-  [{:keys [name label errors]}]
-  [:input] (set-attr :name name))
+  [{:keys [name label errors style]}]
+  [:input] (set-attr :name name :style style))
 
 (defsnippet file-input
   form-template
@@ -408,8 +403,8 @@
 (defn move-errors-to-noir
   "Moves errors from sandbar to Noir and returns the form-data."
   [form-data errors]
-  (println "(FBS) Post request failed validation! Sandbar errors (moving to noir): "
-           errors "\n")
+  (comment (println "(FBS) Post request failed validation! Sandbar errors (moving to noir): "
+                    errors "\n"))
   (doseq [[field [error]] errors]
     (vali/set-error field error))
   (assoc form-data :_sandbar-errors errors))
@@ -491,7 +486,7 @@
                     defaults errors)]
     ;;    (println "(FBS) Noir ERRORS: " @vali/*errors*)
     ;;    (println "(FBS) Sandbar ERRORS: " (:_sandbar-errors form-map))
-    (println "(FBS) Making form. Computed errors / defaults map: " errs-defs)
+    ;; (println "(FBS) Making form. Computed errors / defaults map: " errs-defs)
     errs-defs))
 
 ;;Takes a validator function, an url (route) to POST to, a sequence of
