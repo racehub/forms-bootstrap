@@ -62,7 +62,7 @@
                                           "These can come from a db or another stateful place."
                                           :car "honda"
                                           :languages ["german" "french"]
-                                          :color "red"})
+                                          :color "yellow"})
                    :fields [{:type "text"
                              :name "nickname"
                              :label "Nick Name"
@@ -122,12 +122,18 @@
                              :inputs [["blue" "Blue"]
                                       ["red" "Red"]
                                       ["yellow" "Yellow"]]}
+                            {:type "select"
+                             :name "numbers"
+                             :label "Favorite Numbers"
+                             :custom-inputs [["One" {:value "1" :class "first"}]
+                                             ["Two" {:value "2" :class "second"}]
+                                             ["Three" {:value "3" :class "third"}]]}
                             {:type "radio"
                              :name "car"
                              :label "Favorite Car"
-                             :inputs [["honda" "Honda"]
-                                      ["toyota" "Toyota"]
-                                      ["chevy" "Chevy"]]}
+                             :custom-inputs [["Honda" {:value "honda" :class "Japan"}]
+                                             ["Toyota" {:value "toyota" :class "Japan"}]
+                                             ["Chevy" {:value "chevy" :class "USA"}]]}
                             {:type "checkbox"
                              :name "languages[]"
                              :label "Languages"

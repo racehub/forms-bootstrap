@@ -160,7 +160,7 @@
 (defsnippet select-lite
   form-template
   [:div.select-dropdown :select]
-  [{:keys [name size class label inputs errors default type]
+  [{:keys [name size class label inputs custom-inputs errors default type]
     :or {size "input-large"}}]
   [:select] (do->
              (set-attr :name name
@@ -170,12 +170,21 @@
              (if (string-contains? type "multiple")
                (set-attr :multiple "multiple")
                identity))
-  [:option] (clone-for [[value value-label] inputs]
-                       (do-> (set-attr :value value)
-                             (if (= default value)
-                               (set-attr :selected "selected")
-                               identity)
-                             (content value-label))))
+  ;; custom inputs attrs map ex: {:value "" :class "" :id ""}
+  [:option] (if custom-inputs
+              (clone-for [[label {:keys [value] :as attrs}]
+                          custom-inputs]
+                         (do-> #(assoc % :attrs attrs)
+                               (if (= default value)
+                                 (set-attr :selected "selected")
+                                 identity)
+                               (content label)))
+              (clone-for [[value value-label] inputs]
+                         (do-> (set-attr :value value)
+                               (if (= default value)
+                                 (set-attr :selected "selected")
+                                 identity)
+                               (content value-label)))))
 
 (defsnippet select-field
   form-template
@@ -191,26 +200,47 @@
 ;;Creates a radio or checkbox form list with the given attributes
 ;; ex: {:type "select" :name "cars" :size "xlarge" :label "Cars"
 ;;      :inputs [["volvo" "Volvo"] ["honda" "Honda"]]}
+;;custom-inputs format: [["OptionLabelOne" {:class "first" :value
+;; "one"}]]
+;;TO DO: CLEAN THIS UP
 (defsnippet checkbox-or-radio-lite
   form-template
   [:div.checkbox-or-radio :div.controls :label]
-  [{:keys [name inputs type errors default]}]
-  [:label] (clone-for [[value value-label] inputs]
-                      [:label] (do-> (set-attr :class type)
-                                     (if (string-contains? type "inline")
-                                       (add-class "inline")
-                                       identity))
-                      [:input] (do-> (set-attr :type (first-word type)
-                                               :name name
-                                               :value value
-                                               :id (remove-spaces
-                                                    value))
-                                     (content value-label)
-                                     (if (contains?
-                                          (set (collectify default))
-                                          value)
-                                       (set-attr :checked "checked")
-                                       identity))))
+  [{:keys [name inputs custom-inputs type errors default]}]
+  [:label] (if custom-inputs
+             (clone-for [[value-label {:keys [value] :as attrs}] custom-inputs]
+                        [:label] (do-> (set-attr :class type)
+                                       (if (string-contains? type "inline")
+                                         (add-class "inline")
+                                         identity))
+                        [:input] (do->
+                                  #(assoc % :attrs attrs)
+                                  (set-attr :type (first-word type)
+                                            :name name
+                                            :id (remove-spaces
+                                                 value))
+                                  (content value-label)
+                                  (if (contains?
+                                       (set (collectify default))
+                                       value)
+                                    (set-attr :checked "checked")
+                                    identity)))
+             (clone-for [[value value-label] inputs]
+                        [:label] (do-> (set-attr :class type)
+                                       (if (string-contains? type "inline")
+                                         (add-class "inline")
+                                         identity))
+                        [:input] (do-> (set-attr :type (first-word type)
+                                                 :name name
+                                                 :value value
+                                                 :id (remove-spaces
+                                                      value))
+                                       (content value-label)
+                                       (if (contains?
+                                            (set (collectify default))
+                                            value)
+                                         (set-attr :checked "checked")
+                                         identity)))))
 
 (defsnippet checkbox-or-radio
   form-template
