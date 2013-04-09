@@ -75,11 +75,14 @@
   form-template
   [:div.input-field :input]
   [{:keys [id hidden name label class type size errors default
-           disabled placeholder value onclick style]
+           disabled placeholder value onclick style custom-attrs]
     :or {size "input-large"
          default ""}}]
   [:input] (do->
             (set-attr :name name :type type :class size :style style :placeholder placeholder)
+            (if custom-attrs
+              (apply set-attr custom-attrs)
+              identity)
             (if (= type "button")
               (set-attr :value value)
               (set-attr :value default))
@@ -131,11 +134,14 @@
 (defsnippet text-area-lite
   form-template
   [:div.text-area :textarea]
-  [{:keys [name label size rows errors default class style]
+  [{:keys [name label size rows errors default class style custom-attrs]
     :or {size "input-large"
          rows "3"
          default ""}}]
   [:textarea] (do-> (set-attr :class size :style style :name name :rows rows)
+                    (if custom-attrs
+                      (apply set-attr custom-attrs)
+                      identity)
                     (add-class class)
                     (content default)))
 
@@ -155,10 +161,13 @@
 (defsnippet select-lite
   form-template
   [:div.select-dropdown :select]
-  [{:keys [name size style class label inputs custom-inputs errors default type]
+  [{:keys [name size style class label inputs custom-inputs errors default type custom-attrs]
     :or {size "input-large"}}]
   [:select] (do->
              (set-attr :name name :id name :style style :class size)
+             (if custom-attrs
+               (apply set-attr custom-attrs)
+               identity)
              (add-class class)
              (if (string-contains? type "multiple")
                (set-attr :multiple "multiple")
@@ -199,7 +208,7 @@
 (defsnippet checkbox-or-radio-lite
   form-template
   [:div.checkbox-or-radio :div.controls :label]
-  [{:keys [name inputs custom-inputs type errors default style]}]
+  [{:keys [name inputs custom-inputs type errors default style custom-attrs]}]
   [:label] (if custom-inputs
              (clone-for [[value-label {:keys [value] :as attrs}] custom-inputs]
                         [:label] (do-> (set-attr :class type)
@@ -213,6 +222,9 @@
                                             :style style
                                             :id (remove-spaces
                                                  value))
+                                  (if custom-attrs
+                                    (apply set-attr custom-attrs)
+                                    identity)
                                   (content value-label)
                                   (if (contains?
                                        (set (collectify default))
@@ -254,8 +266,11 @@
 (defsnippet file-input-lite
   form-template
   [:div.file-input :input]
-  [{:keys [name label errors style]}]
-  [:input] (set-attr :name name :style style))
+  [{:keys [name label errors style custom-attrs]}]
+  [:input] (do-> (set-attr :name name :style style)
+                 (if custom-attrs
+                   (apply set-attr custom-attrs)
+                   identity)))
 
 (defsnippet file-input
   form-template

@@ -6,6 +6,7 @@
         net.cgrand.enlive-html)
   (:require [noir.response :as response]
             [noir.session :as session]
+            [clojure.data.json :as json]
             [sandbar.validation :as v]))
 
 (def test-template "forms_bootstrap/test/test-page.html")
@@ -111,6 +112,13 @@
                             {:type "text-area"
                              :name "description"
                              :label "Favorite Quote"}
+                            {:type "text"
+                             :name "typeahead-test"
+                             :label "Typeahead JS"
+                             :custom-attrs [:data-provide "typeahead"
+                                            :data-source (json/write-str
+                                                          ["Alabama" "Alaska" "Arizona"
+                                                           "Arkansas"])]}
                             ;;<input value="Add Exercise" onclick="add('time')" class="btn" type="button">
                             {:type "button"
                              :class "btn"
