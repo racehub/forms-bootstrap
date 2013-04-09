@@ -6,6 +6,7 @@
         net.cgrand.enlive-html)
   (:require [noir.response :as response]
             [noir.session :as session]
+            [clojure.data.json :as json]
             [sandbar.validation :as v]))
 
 (def test-template "forms_bootstrap/test/test-page.html")
@@ -62,11 +63,22 @@
                                           "These can come from a db or another stateful place."
                                           :car "honda"
                                           :languages ["german" "french"]
-                                          :color "yellow"})
+                                          :color "yellow"
+                                          :hidden-test "something"
+                                          :hide-if-empty "not-hidden-now"})
                    :fields [{:type "text"
                              :name "nickname"
                              :label "Nick Name"
                              :size "input-large"}
+                            {:type "text"
+                             :name "hidden-test"
+                             :label "Hidden Test"
+                             :hidden true ;;hidden always hides a field
+                             :size "input-large"}
+                            {:type "text"
+                             :name "hide-if-empty2"
+                             :hide-if-empty true
+                             :label "Wont be visible"}
                             {:type "custom"
                              :html-nodes [{:tag :p
                                            :content
@@ -104,10 +116,16 @@
                                         :html-nodes {:tag :p
                                                      :attrs {:style "display:inline"}
                                                      :content ["Sometext"]}}
-                                       {:name "secondthing"
+                                       {:name "hide-if-empty"
                                         :type "text"
-                                        :style "display: none;"
+                                        :hide-if-empty true
                                         :placeholder "B"}]}
+                            {:type "text"
+                             :name "typeahead-test"
+                             :label "Typeahead JS"
+                             :custom-attrs [:data-provide "typeahead" :data-source
+                                            (json/write-str
+                                             ["Alabama" "Alaska" "Arizona" "Arkansas"])]}
                             {:type "text-area"
                              :name "description"
                              :label "Favorite Quote"}
@@ -120,7 +138,9 @@
                             {:type "select"
                              :name "color"
                              :label "Favorite Color"
-                             :inputs [["blue" "Blue"]
+                             :hide-if-empty true
+                             :inputs [["" "Pick One"]
+                                      ["blue" "Blue"]
                                       ["red" "Red"]
                                       ["yellow" "Yellow"]]}
                             {:type "select"
