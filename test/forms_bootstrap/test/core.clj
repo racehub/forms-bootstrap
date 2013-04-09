@@ -63,22 +63,11 @@
                                           "These can come from a db or another stateful place."
                                           :car "honda"
                                           :languages ["german" "french"]
-                                          :color "yellow"
-                                          :hidden-test "something"
-                                          :hide-if-empty "not-hidden-now"})
+                                          :color "yellow"})
                    :fields [{:type "text"
                              :name "nickname"
                              :label "Nick Name"
                              :size "input-large"}
-                            {:type "text"
-                             :name "hidden-test"
-                             :label "Hidden Test"
-                             :hidden true ;;hidden always hides a field
-                             :size "input-large"}
-                            {:type "text"
-                             :name "hide-if-empty2"
-                             :hide-if-empty true
-                             :label "Wont be visible"}
                             {:type "custom"
                              :html-nodes [{:tag :p
                                            :content
@@ -116,9 +105,9 @@
                                         :html-nodes {:tag :p
                                                      :attrs {:style "display:inline"}
                                                      :content ["Sometext"]}}
-                                       {:name "hide-if-empty"
+                                       {:name "secondthing"
                                         :type "text"
-                                        :hide-if-empty true
+                                        :style "display: none;"
                                         :placeholder "B"}]}
                             {:type "text"
                              :name "typeahead-test"
@@ -129,6 +118,13 @@
                             {:type "text-area"
                              :name "description"
                              :label "Favorite Quote"}
+                            {:type "text"
+                             :name "typeahead-test"
+                             :label "Typeahead JS"
+                             :custom-attrs [:data-provide "typeahead"
+                                            :data-source (json/write-str
+                                                          ["Alabama" "Alaska" "Arizona"
+                                                           "Arkansas"])]}
                             ;;<input value="Add Exercise" onclick="add('time')" class="btn" type="button">
                             {:type "button"
                              :class "btn"
@@ -138,7 +134,6 @@
                             {:type "select"
                              :name "color"
                              :label "Favorite Color"
-                             :hide-if-empty true
                              :inputs [["" "Pick One"]
                                       ["blue" "Blue"]
                                       ["red" "Red"]

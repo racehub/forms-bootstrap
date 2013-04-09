@@ -89,8 +89,8 @@
 (defsnippet input-lite
   form-template
   [:div.input-field :input]
-  [{:keys [id hidden name label class type size errors default value
-           disabled placeholder value onclick style hide-if-empty custom-attrs]
+  [{:keys [id name label class type size errors default
+           disabled placeholder value onclick style custom-attrs]
     :or {size "input-large"
          default ""}}]
   [:input] (do->
@@ -98,12 +98,9 @@
             (if custom-attrs
               (apply set-attr custom-attrs)
               identity)
-            (if (and (empty? default) (empty? value) hide-if-empty)
-              (add-class "hide")
-              (if hidden
-                (add-class "hide")
-                (remove-class "hide")))
-            (set-attr :value (or value default))
+            (if (= type "button")
+              (set-attr :value value)
+              (set-attr :value default))
             (if (seq onclick)
               (set-attr :onclick onclick)
               identity)
@@ -112,23 +109,19 @@
               identity)
             (add-class class)))
 
-;;hidden hides a field no matter what
-;;hide-if-empty only hides a field if it is empty (no default value)
 (defsnippet input-field
   form-template
   [:div.input-field]
   [{:keys [id hidden name label class type size errors default value disabled
-           placeholder help-inline help-block hide-if-empty]
+           placeholder help-inline help-block]
     :as m}]
   [:.input-field] (do->
                    (if id
                      (set-attr :id id)
                      identity)
-                   (if (and (empty? default) (empty? value) hide-if-empty)
-                     (add-class "hide")
-                     (if hidden
-                       (add-class "hide")
-                       (remove-class "hide")))
+                   (if hidden
+                     (add-class "hidden")
+                     identity)
                    (handle-error-css errors))
   [:label] (do-> (content label)
                  (set-attr :for name))
@@ -141,8 +134,7 @@
 (defsnippet text-area-lite
   form-template
   [:div.text-area :textarea]
-  [{:keys [name label size rows errors default value class style hidden hide-if-empty
-           custom-attrs]
+  [{:keys [name label size rows errors default class style custom-attrs]
     :or {size "input-large"
          rows "3"
          default ""}}]
@@ -151,25 +143,14 @@
                       (apply set-attr custom-attrs)
                       identity)
                     (add-class class)
-                    (if (and (empty? default) (empty? value) hide-if-empty)
-                      (add-class "hide")
-                      (if hidden
-                        (add-class "hide")
-                        (remove-class "hide")))
-                    (content (or value default))))
+                    (content default)))
 
 (defsnippet text-area-field
   form-template
   [:div.text-area]
-  [{:keys [name label size rows errors default value help-inline help-block
-           hidden hide-if-empty] :as m}]
+  [{:keys [name label size rows errors default value help-inline help-block] :as m}]
   [:div.text-area] (do->
-                    (handle-error-css errors)
-                    (if (and (empty? default) (empty? value) hide-if-empty)
-                      (add-class "hide")
-                      (if hidden
-                        (add-class "hide")
-                        (remove-class "hide"))))
+                    (handle-error-css errors))
   [:label] (do-> (set-attr :for name)
                  (content label))
   [:textarea] (constantly (text-area-lite m))
@@ -181,8 +162,7 @@
 (defsnippet select-lite
   form-template
   [:div.select-dropdown :select]
-  [{:keys [name size style class label inputs custom-inputs errors default
-           type hidden hide-if-empty custom-attrs]
+  [{:keys [name size style class label inputs custom-inputs errors default type custom-attrs]
     :or {size "input-large"}}]
   [:select] (do->
              (set-attr :name name :id name :style style :class size)
@@ -190,11 +170,6 @@
                (apply set-attr custom-attrs)
                identity)
              (add-class class)
-             (if (and (empty? default) hide-if-empty)
-               (add-class "hide")
-               (if hidden
-                 (add-class "hide")
-                 (remove-class "hide")))
              (if (string-contains? type "multiple")
                (set-attr :multiple "multiple")
                identity))
@@ -217,16 +192,9 @@
 (defsnippet select-field
   form-template
   [:div.select-dropdown]
-  [{:keys [name size label inputs errors default type help-inline help-block hidden
-           hide-if-empty]
+  [{:keys [name size label inputs errors default type help-inline help-block hidden]
     :as m}]
-  [:div.select-dropdown] (do->
-                          (handle-error-css errors)
-                          (if (and (empty? default) hide-if-empty)
-                            (add-class "hide")
-                            (if hidden
-                              (add-class "hide")
-                              (remove-class "hide"))))
+  [:div.select-dropdown] (handle-error-css errors)
   [:label] (do-> (content label)
                  (set-attr :for name))
   [:select] (constantly (select-lite m))
@@ -241,15 +209,10 @@
 (defsnippet checkbox-or-radio-lite
   form-template
   [:div.checkbox-or-radio :div.controls :label]
-  [{:keys [name inputs custom-inputs type errors default style hidden hide-if-empty]}]
+  [{:keys [name inputs custom-inputs type errors default style custom-attrs]}]
   [:label] (if custom-inputs
              (clone-for [[value-label {:keys [value] :as attrs}] custom-inputs]
                         [:label] (do-> (set-attr :class type)
-                                       (if (and (empty? default) hide-if-empty)
-                                         (add-class "hide")
-                                         (if hidden
-                                           (add-class "hide")
-                                           (remove-class "hide")))
                                        (if (string-contains? type "inline")
                                          (add-class "inline")
                                          identity))
@@ -260,6 +223,9 @@
                                             :style style
                                             :id (remove-spaces
                                                  value))
+                                  (if custom-attrs
+                                    (apply set-attr custom-attrs)
+                                    identity)
                                   (content value-label)
                                   (if (contains?
                                        (set (collectify default))
@@ -287,15 +253,9 @@
 (defsnippet checkbox-or-radio
   form-template
   [:.checkbox-or-radio]
-  [{:keys [class name label inputs default errors help-inline
-           help-block hidden hide-if-empty] :as m}]
+  [{:keys [class name label inputs default errors help-inline help-block] :as m}]
   [:div.checkbox-or-radio]  (do->
                              (add-class class) ;;'checkbox' or 'radio'
-                             (if (and (empty? default) hide-if-empty)
-                               (add-class "hide")
-                               (if hidden
-                                 (add-class "hide")
-                                 (remove-class "hide")))
                              (handle-error-css errors))
   [:label.control-label] (do-> (content label)
                                (set-attr :name name))
