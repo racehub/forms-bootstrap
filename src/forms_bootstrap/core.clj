@@ -194,7 +194,11 @@
   [:div.select-dropdown]
   [{:keys [name size label inputs errors default type help-inline help-block hidden]
     :as m}]
-  [:div.select-dropdown] (handle-error-css errors)
+  [:div.select-dropdown] (do->
+                          (handle-error-css errors)
+                          (if hidden
+                            (add-class "hidden")
+                            identity))
   [:label] (do-> (content label)
                  (set-attr :for name))
   [:select] (constantly (select-lite m))
@@ -253,9 +257,12 @@
 (defsnippet checkbox-or-radio
   form-template
   [:.checkbox-or-radio]
-  [{:keys [class name label inputs default errors help-inline help-block] :as m}]
+  [{:keys [class name label inputs default errors help-inline help-block hidden] :as m}]
   [:div.checkbox-or-radio]  (do->
                              (add-class class) ;;'checkbox' or 'radio'
+                             (if hidden
+                               (add-class "hidden")
+                               identity)
                              (handle-error-css errors))
   [:label.control-label] (do-> (content label)
                                (set-attr :name name))
