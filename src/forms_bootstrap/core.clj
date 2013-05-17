@@ -322,9 +322,13 @@
 (defsnippet inline-fields
   form-template
   [:div.inline-fields]
-  [{:keys [name label type columns inline-content]}]
+  [{:keys [name label type columns inline-content hidden]}]
   [:label] (content label)
-  [:div.inline-fields] (handle-error-css (some (fn[a] a) (map :errors columns)) )
+  [:div.inline-fields] (do->
+                        (handle-error-css (some (fn[a] a) (map :errors columns)) )
+                        (if hidden
+                          (add-class "hidden")
+                          identity))
   [:div.controls-row] (content
                        (interpose " " inline-content)
                        (when-let [err-msg (some (fn[a] a) (map :errors columns))]
