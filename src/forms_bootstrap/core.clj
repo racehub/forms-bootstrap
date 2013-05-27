@@ -322,19 +322,19 @@
 (defsnippet inline-fields
   form-template
   [:div.inline-fields]
-  [{:keys [name label type columns inline-content hidden]}]
+  [{:keys [name label type columns inline-content hidden help-inline]}]
   [:label] (content label)
   [:div.inline-fields] (do->
-                        (handle-error-css (some (fn[a] a) (map :errors columns)) )
+                        (handle-error-css (some (fn[a] a) (map :errors columns)))
                         (if hidden
                           (add-class "hidden")
                           identity))
   [:div.controls-row] (content
                        (interpose " " inline-content)
-                       (when-let [err-msg (some (fn[a] a) (map :errors columns))]
-                         {:tag "span"
-                          :attrs {:class "help-inline"}
-                          :content err-msg})))
+                       (if-let [err-msg (some (fn[a] a) (map :errors columns))]
+                         (span "help-inline" err-msg)
+                         (when help-inline
+                           (span "help-inline" help-inline)))))
 
 (defn make-field
   "Takes a single map representing a form element's attributes and

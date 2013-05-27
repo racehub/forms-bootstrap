@@ -196,6 +196,7 @@
 (form-helper helper-example
              :validator (v/build-validator (v/non-empty-string :first-name)
                                            (v/non-empty-string :last-name)
+                                           (v/non-empty-string :birthday-month)
                                            (v/non-nil :gender)
                                            (color-selected)
                                            (email-valid?))
@@ -238,6 +239,7 @@
                       {:type "inline-fields"
                        :name "birthday"
                        :label "Birthday"
+                       :help-inline "inline help"
                        :columns [{:name "birthday-day"
                                   :type "select"
                                   :size "input-small"
