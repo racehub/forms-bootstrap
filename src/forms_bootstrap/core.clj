@@ -62,7 +62,7 @@
                   identity)
                 (content (if (empty? legend)
                            fields
-                           (list {:tag "legend"
+                           (list {:tag :legend
                                   :content legend}
                                  fields)))
                 (append submitter)))
