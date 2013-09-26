@@ -95,7 +95,8 @@
     :or {size "input-large"
          default ""}}]
   [:input] (do->
-            (set-attr :name name :type type :class size :style style :placeholder placeholder)
+            (set-attr :name name :type type :class size :style style :placeholder placeholder
+                      :id id)
             (if custom-attrs
               (apply set-attr custom-attrs)
               identity)
@@ -135,11 +136,11 @@
 (defsnippet text-area-lite
   form-template
   [:div.text-area :textarea]
-  [{:keys [name label size rows errors default class style custom-attrs]
+  [{:keys [name label size rows errors default class style custom-attrs id]
     :or {size "input-large"
          rows "3"
          default ""}}]
-  [:textarea] (do-> (set-attr :class size :style style :name name :rows rows)
+  [:textarea] (do-> (set-attr :class size :style style :name name :rows rows :id id)
                     (if custom-attrs
                       (apply set-attr custom-attrs)
                       identity)
@@ -163,10 +164,10 @@
 (defsnippet select-lite
   form-template
   [:div.select-dropdown :select]
-  [{:keys [name size style class label inputs custom-inputs errors default type custom-attrs]
+  [{:keys [name size style class label inputs custom-inputs errors default type custom-attrs id]
     :or {size "input-large"}}]
   [:select] (do->
-             (set-attr :name name :id name :style style :class size)
+             (set-attr :name name :id (or id name) :style style :class size)
              (if custom-attrs
                (apply set-attr custom-attrs)
                identity)
