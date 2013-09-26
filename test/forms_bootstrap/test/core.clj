@@ -15,8 +15,8 @@
   test-template
   [{:keys [form-tests links]}]
   [:p.example-link] (clone-for [[href link-name] links]
-                                 [:a] (do-> (set-attr :href href)
-                                            (content link-name)))
+                               [:a] (do-> (set-attr :href href)
+                                          (content link-name)))
   [:section] (clone-for [[form-test header descr] form-tests]
                         [:div.page-header :h3] (html-content
                                                 (str header " <small>" descr "</small"))
@@ -49,6 +49,8 @@
                 [[(make-form
                    :action "/someaction"
                    :submit-label "Send it!"
+                   :form-attrs {:onsubmit
+                                "return confirm('Are you sure you want to submit results?')"}
                    :cancel-link "/"
                    ;;you can pass in any defaults here that you want
                    ;;to preopulate the form with.
@@ -202,6 +204,8 @@
                                            (email-valid?))
              :post-url "/some-post-url"
              :submit-label "Sign Up!"
+             :button-attrs {:data-loading-text "Loading..."
+                            :onclick "$(this).button('loading');"}
              :enctype "multipart/form-data"
              :fields [{:name "first-name"
                        :label "First Name"

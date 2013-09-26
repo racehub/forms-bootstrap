@@ -51,12 +51,11 @@
 (defsnippet basic-form
   form-template
   [:form]
-  [{:keys [action fields submitter class enctype legend method]
+  [{:keys [action fields submitter class enctype legend method form-attrs]
     :or {class "form-horizontal"
          method "post"}}]
-  [:form] (do-> (set-attr :action action
-                          :class class
-                          :method method)
+  [:form] (do-> (apply set-attr (concat [:action action :class class :method method]
+                                        (flatten (into [] form-attrs))))
                 (if (seq enctype)
                   (set-attr :enctype enctype)
                   identity)
@@ -294,15 +293,18 @@
 (defsnippet button-lite
   form-template
   [:div#submit-button :button]
-  [label class]
+  [label class button-attrs]
   [:button] (do-> (content label)
+                  (if (seq button-attrs)
+                    (apply set-attr (flatten (into [] button-attrs)))
+                    identity)
                   (add-class class)))
 
 (defsnippet make-submit-button
   form-template
   [:div#submit-button]
-  [label cancel-link]
-  [:button] (constantly (button-lite label "btn-primary"))
+  [label cancel-link button-attrs]
+  [:button] (constantly (button-lite label "btn-primary" button-attrs))
   [:a] (if cancel-link
          (if (= cancel-link "modal")
            (set-attr :data-dismiss "modal")
@@ -387,36 +389,31 @@
   "Returns a form with the specified action, fields, and submit
   button. Fields is a sequence of maps, each containing a form element's
   attributes."
-  [& {:keys [action class fields submit-label errors-and-defaults
-             enctype cancel-link legend button-type method] :as form-map
+  [& {:keys [action class fields submit-label errors-and-defaults enctype
+             cancel-link legend button-type button-attrs method forms-attrs] :as form-map
       :or {class "form-horizontal"
            method "post"}}]
-  ;;    (println "make-form input map: " form-map "\n")
-  (basic-form {:action action
-               :legend legend
-               :method method
-               :class class
-               :enctype  enctype
-               :fields   (map (fn [{:keys [name type] :as a-field}]
-                                (make-field
-                                 class
-                                 (merge a-field
-                                        (if (string-contains? type "inline-fields")
-                                          (inline-errs-defs a-field errors-and-defaults)
-                                          (if (not (= type "custom"))
-                                            (get errors-and-defaults
-                                                 (keyword
-                                                  ;;replace [] in case its
-                                                  ;;the name of a form
-                                                  ;;element that can take
-                                                  ;;on mutliple values (ie checkbox)
-                                                  (string/replace name "[]" "")))
-                                            {})))))
-                              fields)
-               :submitter (if (string-contains? class "form-inline")
-                            (button-lite submit-label button-type)
-                            (when submit-label
-                              (make-submit-button submit-label cancel-link)))}))
+  (basic-form
+   (-> (select-keys form-map [:action :legend :method :form-attrs :class :enctype])
+       (assoc :fields (map (fn [{:keys [name type] :as a-field}]
+                             (make-field class
+                                         (merge a-field
+                                                (if (string-contains? type "inline-fields")
+                                                  (inline-errs-defs a-field errors-and-defaults)
+                                                  (if (not (= type "custom"))
+                                                    (get errors-and-defaults
+                                                         (keyword
+                                                          ;;replace [] in case its
+                                                          ;;the name of a form
+                                                          ;;element that can take
+                                                          ;;on mutliple values (ie checkbox)
+                                                          (string/replace name "[]" "")))
+                                                    {})))))
+                           fields)
+              :submitter (if (string-contains? class "form-inline")
+                           (button-lite submit-label button-type button-attrs)
+                           (when submit-label
+                             (make-submit-button submit-label cancel-link button-attrs)))))))
 
 
 ;;MACROS
@@ -556,7 +553,7 @@
 (defmacro post-helper
   [& {:keys [post-url validator on-success on-failure]}]
   `(defpage [:post ~post-url] {:as m#}
-;;     (println "post-helper map: " m#)
+     ;;     (println "post-helper map: " m#)
      (if-valid ~validator m#
                ~on-success
                (comp ~on-failure move-errors-to-flash))))
