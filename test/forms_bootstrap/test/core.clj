@@ -65,7 +65,8 @@
                                           "These can come from a db or another stateful place."
                                           :car "honda"
                                           :languages ["german" "french"]
-                                          :color "yellow"})
+                                          :color "yellow"
+                                          :myhiddenfield "thehiddendefault"})
                    :fields [{:type "text"
                              :name "nickname"
                              :label "Nick Name"
@@ -82,10 +83,10 @@
                              :name "password"
                              :label "Password"}
                             {:type "hidden"
-                             :name "myhiddenfield"
-                             :value "hiddenvalue"}
+                             :name "myhiddenfield"}
                             {:type "text"
                              :name "city"
+                             ;; :value "overwrite default"
                              :label "City"
                              :placeholder "Placeholder!"}
                             {:type "inline-fields"

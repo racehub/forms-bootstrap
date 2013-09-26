@@ -75,7 +75,9 @@
          default ""}}]
   [:input] (do->
             (set-attr :name name)
-            (set-attr :value value)
+            (if value
+              (set-attr :value value)
+              (set-attr :value default))
             (if (= disabled true)
               (set-attr :disabled "")
               identity)
@@ -97,7 +99,7 @@
             (if custom-attrs
               (apply set-attr custom-attrs)
               identity)
-            (if (= type "button")
+            (if value
               (set-attr :value value)
               (set-attr :value default))
             (if (seq onclick)
