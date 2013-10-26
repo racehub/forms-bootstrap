@@ -1,15 +1,16 @@
 (ns forms-bootstrap.core
   (:use net.cgrand.enlive-html
-        noir.core
         forms-bootstrap.util
         [sandbar.validation :only (if-valid)])
   (:require [noir.validation :as vali]
+            [compojure.core :as c]
             [clojure.string :as string]
             [noir.session :as session]
             [noir.response :as response]))
 
 (def form-template "forms_bootstrap/forms-template.html")
-;;HELPER FUNCTIONS
+
+;; ## HELPER FUNCTIONS
 
 (defn handle-error-css
   "Used within a snippet to add 'error' to the class of an html element, if appropriate."
@@ -42,7 +43,7 @@
        identity))))
 
 
-;; SNIPPETS
+;; ## SNIPPETS
 
 ;;Grabs the whole form from the template, sets the action, replaces
 ;;the entire contents with fields, and appends a submit button.
@@ -517,6 +518,15 @@
     ;; (println "(FBS) Making form. Computed errors / defaults map: " errs-defs)
     errs-defs))
 
+;;Can Use post-helper with make-form when you don't have enough info to use
+;;form-helper.
+(defmacro post-helper
+  [& {:keys [post-url validator on-success on-failure]}]
+  `(c/POST ~post-url [:as {m# :params}]
+           (if-valid ~validator m#
+                     ~on-success
+                     (comp ~on-failure move-errors-to-flash))))
+
 ;;Takes a validator function, an url (route) to POST to, a sequence of
 ;;maps each containing a form element's attributes, a submit label for
 ;;the form, and functions to call in the POST handler on success or
@@ -546,17 +556,8 @@
                  :errors-and-defaults)
                (apply concat)
                (apply make-form))))
-     (defpage [:post ~post-url] {:as m#}
-       (if-valid ~validator m#
-                 ~on-success
-                 (comp ~on-failure move-errors-to-flash)))))
-
-;;Can Use post-helper with make-form when you don't have enough info to use
-;;form-helper.
-(defmacro post-helper
-  [& {:keys [post-url validator on-success on-failure]}]
-  `(defpage [:post ~post-url] {:as m#}
-     ;;     (println "post-helper map: " m#)
-     (if-valid ~validator m#
-               ~on-success
-               (comp ~on-failure move-errors-to-flash))))
+     (def ~(symbol (str sym "-post"))
+       (post-helper :post-url ~post-url
+                    :validator ~validator
+                    :on-success ~on-success
+                    :on-failure ~on-failure))))

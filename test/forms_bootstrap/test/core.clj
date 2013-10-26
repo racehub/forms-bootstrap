@@ -1,10 +1,8 @@
 (ns forms-bootstrap.test.core
-  (:use forms-bootstrap.core
-        clojure.test
-        forms-bootstrap.util
-        noir.core
-        net.cgrand.enlive-html)
-  (:require [noir.response :as response]
+  (:use net.cgrand.enlive-html)
+  (:require [forms-bootstrap.util :as u]
+            [forms-bootstrap.core :as c]
+            [noir.response :as response]
             [noir.session :as session]
             [clojure.data.json :as json]
             [sandbar.validation :as v]))
@@ -23,7 +21,7 @@
                         [:div.formhere] (content form-test)))
 
 ;;This first example uses the make-form function
-(defpage "/" []
+(defn index-page []
   (test-layout {:links
                 [["/make-form" "Make-Form Example"]
                  ["/form-helper" "Form-Helper Example"]]}))
@@ -44,9 +42,9 @@
 ;;:errors-and-defaults for make-form, and it will show the defaults
 ;;and errors in the form.
 
-(defpage "/make-form" []
+(defn make-form-page []
   (test-layout {:form-tests
-                [[(make-form
+                [[(c/make-form
                    :action "/someaction"
                    :submit-label "Send it!"
                    :form-attrs {:onsubmit
@@ -59,7 +57,7 @@
                    ;;flash for you, and create-errors-defaults-map
                    ;;will grab those and transform them into a format
                    ;;which make-form can use for display.
-                   :errors-and-defaults (create-errors-defaults-map
+                   :errors-and-defaults (c/create-errors-defaults-map
                                          {:city "Something"
                                           :description
                                           "These can come from a db or another stateful place."
@@ -162,19 +160,6 @@
                   "Example One"
                   "How to use make-form"]]}))
 
-(post-helper :post-url "/someaction"
-             :validator (v/build-validator (v/non-empty-string :nickname))
-             :on-success (fn [m]
-                           ;;on success actions here
-                           (println "Successful validation. Your form
-                           map: " m)
-                           (response/redirect "/"))
-             :on-failure (fn [m]
-                           ;;on success actions here
-                           (println "Failed validation. Your form
-                           map: " m)
-                           (response/redirect "/make-form")))
-
 (defn email-valid?
   [{:keys [email] :as m}]
   (if (= email "blah")
@@ -195,99 +180,112 @@
     (v/add-validation-error m :gender "Please select a gender!")
     m))
 
+;; Post Helper Example
+(def post-helper-example
+  (c/post-helper :post-url "/someaction"
+                 :validator (v/build-validator (v/non-empty-string :nickname))
+                 :on-success (fn [m]
+                               ;;on success actions here
+                               (println "Successful validation. Your form map: " m)
+                               (response/redirect "/"))
+                 :on-failure (fn [m]
+                               ;;on success actions here
+                               (println "Failed validation. Your form map: " m)
+                               (response/redirect "/make-form"))))
+
 ;;Form Helper Example
-(form-helper helper-example
-             :validator (v/build-validator (v/non-empty-string :first-name)
-                                           (v/non-empty-string :last-name)
-                                           (v/non-empty-string :birthday-month)
-                                           (v/non-nil :gender)
-                                           (color-selected)
-                                           (email-valid?))
-             :post-url "/some-post-url"
-             :submit-label "Sign Up!"
-             :button-attrs {:data-loading-text "Loading..."
-                            :onclick "$(this).button('loading');"}
-             :enctype "multipart/form-data"
-             :fields [{:name "first-name"
-                       :label "First Name"
-                       :help-inline "This is 'help-inline' for the first name field."
-                       :type "text"}
-                      {:name "last-name"
-                       :help-block "This is 'help-block' for the last
+(c/form-helper helper-example
+               :validator (v/build-validator (v/non-empty-string :first-name)
+                                             (v/non-empty-string :last-name)
+                                             (v/non-empty-string :birthday-month)
+                                             (v/non-nil :gender)
+                                             (color-selected)
+                                             (email-valid?))
+               :post-url "/some-post-url"
+               :submit-label "Sign Up!"
+               :button-attrs {:data-loading-text "Loading..."
+                              :onclick "$(this).button('loading');"}
+               :enctype "multipart/form-data"
+               :fields [{:name "first-name"
+                         :label "First Name"
+                         :help-inline "This is 'help-inline' for the first name field."
+                         :type "text"}
+                        {:name "last-name"
+                         :help-block "This is 'help-block' for the last
                        name field. You can fit more stuff like this."
-                       :label "Last Name"
-                       :type "text"}
-                      {:type "button"
-                       :class "btn"
-                       :name "abutton"
-                       :onclick "add('something')"
-                       :value "Do something!"}
-                      {:type "custom"
-                       :html-nodes [{:tag :p
-                                     :content
-                                     "Some content you might want to put into your form, but not a standard form field."}]}
-                      {:name "gender"
-                       :label "Gender"
-                       :type "radio"
-                       :inputs [["male" "Male"]
-                                ["female" "Female"]]}
-                      {:name "options"
-                       :label "Options"
-                       :type "select"
-                       :inputs [["option1" "Option 1"]
-                                ["option2" "Option 2"]
-                                ["option3" "Option 3"]]}
-                      {:name "email"
-                       :label "Email Address"
-                       :type "text"
-                       :placeholder "Try using 'blah'"}
-                      {:type "inline-fields"
-                       :name "birthday"
-                       :label "Birthday"
-                       :help-inline "inline help"
-                       :columns [{:name "birthday-day"
-                                  :type "select"
-                                  :size "input-small"
-                                  :inputs (let [days (reduce #(conj %1 [(str %2) (str %2)])
-                                                             [] (range 1 32))]
-                                            (insert days 0 ["" "Day"]))}
-                                 {:name "birthday-month"
-                                  :type "select"
-                                  :size "input-small"
-                                  :inputs (let [days (reduce #(conj %1 [(str %2) (str %2)])
-                                                             [] (range 1 13))]
-                                            (insert days 0 ["" "Month"]))}
-                                 {:name "birthday-year"
-                                  :type "select"
-                                  :size "input-small"
-                                  :inputs (let [year (reduce #(conj %1 [(str %2) (str %2)])
-                                                             [] (reverse
-                                                                 (range 1900 2013)))]
-                                            (insert year 0 ["" "Year"]))}]}
-                      {:name "colors[]"
-                       :label "Favorite Colors"
-                       :type "checkbox"
-                       :inputs [["blue" "Blue"]
-                                ["red" "Red"]
-                                ["yellow" "Yellow"]
-                                ["green" "Green"]]
-                       :note "Pick 2 of the above colors!"}
-                      {:name "username"
-                       :label "Username"
-                       :type "text"}
-                      {:name "password"
-                       :label "Password"
-                       :type "password"}]
-             :on-success (fn [{uname :username :as user-map}]
-                           ;;on success actions here
-                           (println "Successful validation. Your form
+                         :label "Last Name"
+                         :type "text"}
+                        {:type "button"
+                         :class "btn"
+                         :name "abutton"
+                         :onclick "add('something')"
+                         :value "Do something!"}
+                        {:type "custom"
+                         :html-nodes [{:tag :p
+                                       :content
+                                       "Some content you might want to put into your form, but not a standard form field."}]}
+                        {:name "gender"
+                         :label "Gender"
+                         :type "radio"
+                         :inputs [["male" "Male"]
+                                  ["female" "Female"]]}
+                        {:name "options"
+                         :label "Options"
+                         :type "select"
+                         :inputs [["option1" "Option 1"]
+                                  ["option2" "Option 2"]
+                                  ["option3" "Option 3"]]}
+                        {:name "email"
+                         :label "Email Address"
+                         :type "text"
+                         :placeholder "Try using 'blah'"}
+                        {:type "inline-fields"
+                         :name "birthday"
+                         :label "Birthday"
+                         :help-inline "inline help"
+                         :columns [{:name "birthday-day"
+                                    :type "select"
+                                    :size "input-small"
+                                    :inputs (let [days (reduce #(conj %1 [(str %2) (str %2)])
+                                                               [] (range 1 32))]
+                                              (u/insert days 0 ["" "Day"]))}
+                                   {:name "birthday-month"
+                                    :type "select"
+                                    :size "input-small"
+                                    :inputs (let [days (reduce #(conj %1 [(str %2) (str %2)])
+                                                               [] (range 1 13))]
+                                              (u/insert days 0 ["" "Month"]))}
+                                   {:name "birthday-year"
+                                    :type "select"
+                                    :size "input-small"
+                                    :inputs (let [year (reduce #(conj %1 [(str %2) (str %2)])
+                                                               [] (reverse
+                                                                   (range 1900 2013)))]
+                                              (u/insert year 0 ["" "Year"]))}]}
+                        {:name "colors[]"
+                         :label "Favorite Colors"
+                         :type "checkbox"
+                         :inputs [["blue" "Blue"]
+                                  ["red" "Red"]
+                                  ["yellow" "Yellow"]
+                                  ["green" "Green"]]
+                         :note "Pick 2 of the above colors!"}
+                        {:name "username"
+                         :label "Username"
+                         :type "text"}
+                        {:name "password"
+                         :label "Password"
+                         :type "password"}]
+               :on-success (fn [{uname :username :as user-map}]
+                             ;;on success actions here
+                             (println "Successful validation. Your form
                            map: " user-map)
-                           (response/redirect "/"))
-             :on-failure (fn [form-data]
-                           ;;some failure action here
-                           (println "failed, form data: " form-data)
-                           (println "flash: " (session/flash-get :form-data))
-                           (response/redirect "/form-helper")))
+                             (response/redirect "/"))
+               :on-failure (fn [form-data]
+                             ;;some failure action here
+                             (println "failed, form data: " form-data)
+                             (println "flash: " (session/flash-get :form-data))
+                             (response/redirect "/form-helper")))
 
 ;;This example shows how to access the entire request map. Typically
 ;;we just use 'm' from below, which is just the form params portion of
@@ -295,12 +293,8 @@
 ;;'helper-example') to populate default values in case of an
 ;;error. Alternatively, you could use a map with default values from a
 ;;database or some other data source to prepopulate your form.
-(defpage "/form-helper"
-  {:as m}
- ;; (println "form-helper m: " m)
-;;  (println "flash: " (session/flash-get :form-data))
+(defn form-helper [m]
   (fn [req]
-  ;;   (println "Request map: " req)
     (let [default-values {:username "zoey" :birthday-day 12 :first-name 12345
                           :colors ["red" "blue"]}]
       (test-layout
@@ -309,98 +303,88 @@
           "Form-helper Example"
           "Uses the form-helper macro for easy validation."]]}))))
 
-(form-helper helper-example-user
-             :validator (v/build-validator (v/non-empty-string :first-name)
-                                           (v/non-empty-string :last-name)
-                                           (email-valid?))
-             :post-url "/:user/action"
-             :submit-label "Sign Up!"
-             :enctype "multipart/form-data"
-             :fields [{:name "first-name"
-                       :label "First Name"
-                       :help-inline "This is 'help-inline' for the first name field."
-                       :type "text"}
-                      {:name "last-name"
-                       :help-block "This is 'help-block' for the last
+(c/form-helper helper-example-user
+               :validator (v/build-validator (v/non-empty-string :first-name)
+                                             (v/non-empty-string :last-name)
+                                             (email-valid?))
+               :post-url "/:user/action"
+               :submit-label "Sign Up!"
+               :enctype "multipart/form-data"
+               :fields [{:name "first-name"
+                         :label "First Name"
+                         :help-inline "This is 'help-inline' for the first name field."
+                         :type "text"}
+                        {:name "last-name"
+                         :help-block "This is 'help-block' for the last
                        name field. You can fit more stuff like this."
-                       :label "Last Name"
-                       :type "text"}
-                      {:type "button"
-                       :class "btn"
-                       :name "abutton"
-                       :onclick "add('something')"
-                       :value "Do something!"}
-                      {:name "gender"
-                       :label "Gender"
-                       :type "radio"
-                       :inputs [["male" "Male"]
-                                ["female" "Female"]]}
-                      {:name "options"
-                       :label "Options"
-                       :type "select"
-                       :inputs [["option1" "Option 1"]
-                                ["option2" "Option 2"]
-                                ["option3" "Option 3"]]}
-                      {:name "email"
-                       :label "Email Address"
-                       :type "text"
-                       :placeholder "Try using 'blah'"}
-                      {:type "inline-fields"
-                       :name "birthday"
-                       :label "Birthday"
-                       :columns [{:name "birthday-day"
-                                  :type "select"
-                                  :size "input-small"
-                                  :inputs (let [days (reduce #(conj %1 [(str %2) (str %2)])
-                                                             [] (range 1 32))]
-                                            (insert days 0 ["" "Day"]))}
-                                 {:name "birthday-month"
-                                  :type "select"
-                                  :size "input-small"
-                                  :inputs (let [days (reduce #(conj %1 [(str %2) (str %2)])
-                                                             [] (range 1 13))]
-                                            (insert days 0 ["" "Month"]))}
-                                 {:name "birthday-year"
-                                  :type "select"
-                                  :size "input-small"
-                                  :inputs (let [year (reduce #(conj %1 [(str %2) (str %2)])
-                                                             [] (reverse
-                                                                 (range 1900 2013)))]
-                                            (insert year 0 ["" "Year"]))}]}
-                      {:name "colors[]"
-                       :label "Favorite Colors"
-                       :type "checkbox"
-                       :inputs [["blue" "Blue"]
-                                ["red" "Red"]
-                                ["yellow" "Yellow"]
-                                ["green" "Green"]]
-                       :note "Pick 2 of the above colors!"}
-                      {:type "file-input"
-                       :name "pic"
-                       :label "Choose a pic"}
-                      {:name "username"
-                       :label "Username"
-                       :type "text"}
-                      {:name "password"
-                       :label "Password"
-                       :type "password"}]
-             :on-success (fn [{uname :username :as user-map}]
-                           ;;on success actions here
-                           (println "Successful validation. Your form
+                         :label "Last Name"
+                         :type "text"}
+                        {:type "button"
+                         :class "btn"
+                         :name "abutton"
+                         :onclick "add('something')"
+                         :value "Do something!"}
+                        {:name "gender"
+                         :label "Gender"
+                         :type "radio"
+                         :inputs [["male" "Male"]
+                                  ["female" "Female"]]}
+                        {:name "options"
+                         :label "Options"
+                         :type "select"
+                         :inputs [["option1" "Option 1"]
+                                  ["option2" "Option 2"]
+                                  ["option3" "Option 3"]]}
+                        {:name "email"
+                         :label "Email Address"
+                         :type "text"
+                         :placeholder "Try using 'blah'"}
+                        {:type "inline-fields"
+                         :name "birthday"
+                         :label "Birthday"
+                         :columns [{:name "birthday-day"
+                                    :type "select"
+                                    :size "input-small"
+                                    :inputs (let [days (reduce #(conj %1 [(str %2) (str %2)])
+                                                               [] (range 1 32))]
+                                              (u/insert days 0 ["" "Day"]))}
+                                   {:name "birthday-month"
+                                    :type "select"
+                                    :size "input-small"
+                                    :inputs (let [days (reduce #(conj %1 [(str %2) (str %2)])
+                                                               [] (range 1 13))]
+                                              (u/insert days 0 ["" "Month"]))}
+                                   {:name "birthday-year"
+                                    :type "select"
+                                    :size "input-small"
+                                    :inputs (let [year (reduce #(conj %1 [(str %2) (str %2)])
+                                                               [] (reverse
+                                                                   (range 1900 2013)))]
+                                              (u/insert year 0 ["" "Year"]))}]}
+                        {:name "colors[]"
+                         :label "Favorite Colors"
+                         :type "checkbox"
+                         :inputs [["blue" "Blue"]
+                                  ["red" "Red"]
+                                  ["yellow" "Yellow"]
+                                  ["green" "Green"]]
+                         :note "Pick 2 of the above colors!"}
+                        {:type "file-input"
+                         :name "pic"
+                         :label "Choose a pic"}
+                        {:name "username"
+                         :label "Username"
+                         :type "text"}
+                        {:name "password"
+                         :label "Password"
+                         :type "password"}]
+               :on-success (fn [{uname :username :as user-map}]
+                             ;;on success actions here
+                             (println "Successful validation. Your form
                            map: " user-map)
-                           (response/redirect "/"))
-             :on-failure (fn [{:keys [user] :as form-data}]
-                           ;;some failure action here
-                           (println "failed, form data: " form-data)
-                           (println "flash: " (session/flash-get :form-data))
-                           (response/redirect (str "/form-helper/" user))))
-
-(defpage "/form-helper/:user"
-  {:keys [user] :as m}
-  (let [default-values {:username user :birthday-day 12 :gender "male" :first-name 12345
-                        :colors ["red" "blue"]}]
-    (test-layout
-     {:form-tests
-      [[(helper-example-user default-values (str "/" user "/action") "/")
-        "Form-helper Example"
-        "Uses the form-helper macro for easy validation."]]})))
+                             (response/redirect "/"))
+               :on-failure (fn [{:keys [user] :as form-data}]
+                             ;;some failure action here
+                             (println "failed, form data: " form-data)
+                             (println "flash: " (session/flash-get :form-data))
+                             (response/redirect (str "/form-helper/" user))))
