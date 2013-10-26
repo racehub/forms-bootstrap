@@ -1,13 +1,14 @@
 (ns forms-bootstrap.util
-  (:require [clojure.string :as string]))
+  (:require [clojure.string :as s]))
 
 (defn remove-spaces
   "Remove spaces from a string"
   [input]
-  (string/replace input " " ""))
+  (s/replace input " " ""))
 
 (defn string-contains?
-  "Takes in a string and any number of search words. Returns true if all of the search words can be found in the input string. "
+  "Takes in a string and any number of search words. Returns true if
+  all of the search words can be found in the input string. "
   [sentence & search-words]
   (let [sent-freq (frequencies (re-seq #"[^\s]+" sentence))
         matches (filter true?
@@ -17,7 +18,7 @@
 (defn first-word
   "Takes an input string and returns the first word in it"
   [x]
-  (clojure.core/get (string/split x #"\s") 0))
+  (clojure.core/get (s/split x #"\s") 0))
 
 (defn collectify
   "Takes in one argument, and returns it if its already a vector,
