@@ -70,9 +70,11 @@
                              :label "Nick Name"
                              :size "input-large"}
                             {:type "custom"
-                             :html-nodes [{:tag :p
-                                           :content
-                                           "Some content you might want to put into your form, but not a standard form field."}]}
+                             :html-nodes [{:tag :div
+                                           :attrs {:class "col-sm-offset-3 col-sm-9"}
+                                           :content [{:tag :p
+                                                      :content
+                                                      "Some content you might want to put into your form, but not a standard form field."}]}]}
                             {:type "checkbox"
                              :name "waiver"
                              :label "Waiver"
@@ -95,17 +97,21 @@
                                         :value "123"}
                                        {:name "firstthing"
                                         :type "text"
+                                        :grid-size 4
                                         :placeholder "A"}
                                        {:type "button"
-                                        :class "btn"
+                                        :class "btn btn-default"
+                                        :grid-size 2
                                         :name "abutton"
-                                        :onclick "add('something')"
-                                        :value "Do something!"}
+                                        :button-attrs {:onclick "alert('something')"}
+                                        :text "Do something!"}
                                        {:name "firstcustomthing"
                                         :type "custom"
-                                        :html-nodes {:tag :p
-                                                     :attrs {:style "display:inline"}
-                                                     :content ["Sometext"]}}
+                                        :html-nodes {:tag :div
+                                                     :attrs {:class "col-sm-3"}
+                                                     :content [{:tag :p
+                                                                :attrs {:style "display:inline"}
+                                                                :content ["Sometext"]}]}}
                                        {:name "secondthing"
                                         :type "text"
                                         :style "display: none;"
@@ -113,25 +119,24 @@
                             {:type "text"
                              :name "typeahead-test"
                              :label "Typeahead JS"
-                             :custom-attrs [:data-provide "typeahead" :data-source
+                             :custom-attrs {:data-provide "typeahead" :data-source
                                             (json/write-str
-                                             ["Alabama" "Alaska" "Arizona" "Arkansas"])]}
+                                             ["Alabama" "Alaska" "Arizona" "Arkansas"])}}
                             {:type "text-area"
                              :name "description"
                              :label "Favorite Quote"}
                             {:type "text"
                              :name "typeahead-test"
                              :label "Typeahead JS"
-                             :custom-attrs [:data-provide "typeahead"
+                             :custom-attrs {:data-provide "typeahead"
                                             :data-source (json/write-str
                                                           ["Alabama" "Alaska" "Arizona"
-                                                           "Arkansas"])]}
+                                                           "Arkansas"])}}
                             ;;<input value="Add Exercise" onclick="add('time')" class="btn" type="button">
                             {:type "button"
-                             :class "btn"
                              :name "abutton"
-                             :onclick "add('something')"
-                             :value "Do something!"}
+                             :button-attrs {:onclick "alert('another something')"}
+                             :text "Do something!"}
                             {:type "select"
                              :name "color"
                              :label "Favorite Color"
@@ -151,7 +156,7 @@
                              :custom-inputs [["Honda" {:value "honda" :class "Japan"}]
                                              ["Toyota" {:value "toyota" :class "Japan"}]
                                              ["Chevy" {:value "chevy" :class "USA"}]]}
-                            {:type "checkbox"
+                            {:type "checkbox inline"
                              :name "languages[]"
                              :label "Languages"
                              :inputs [["german" "German"]
@@ -216,17 +221,16 @@
                          :label "Last Name"
                          :type "text"}
                         {:type "button"
-                         :class "btn"
                          :name "abutton"
-                         :onclick "add('something')"
-                         :value "Do something!"}
+                         :button-attrs {:onclick "alert('something')"}
+                         :text "Do something!"}
                         {:type "custom"
                          :html-nodes [{:tag :p
                                        :content
                                        "Some content you might want to put into your form, but not a standard form field."}]}
                         {:name "gender"
                          :label "Gender"
-                         :type "radio"
+                         :type "radio inline"
                          :inputs [["male" "Male"]
                                   ["female" "Female"]]}
                         {:name "options"
@@ -242,22 +246,25 @@
                         {:type "inline-fields"
                          :name "birthday"
                          :label "Birthday"
-                         :help-inline "inline help"
+                         :help-block "block help message goes here, aligned with first thing."
                          :columns [{:name "birthday-day"
                                     :type "select"
                                     :size "input-small"
+                                    :grid-size 3
                                     :inputs (let [days (reduce #(conj %1 [(str %2) (str %2)])
                                                                [] (range 1 32))]
                                               (u/insert days 0 ["" "Day"]))}
                                    {:name "birthday-month"
                                     :type "select"
                                     :size "input-small"
+                                    :grid-size 3
                                     :inputs (let [days (reduce #(conj %1 [(str %2) (str %2)])
                                                                [] (range 1 13))]
                                               (u/insert days 0 ["" "Month"]))}
                                    {:name "birthday-year"
                                     :type "select"
                                     :size "input-small"
+                                    :grid-size 3
                                     :inputs (let [year (reduce #(conj %1 [(str %2) (str %2)])
                                                                [] (reverse
                                                                    (range 1900 2013)))]

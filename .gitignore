@@ -10,3 +10,5 @@ pom.xml
 /checkouts
 /.lein-deps-sum
 *DS_Store
+.lein-repl-history
+.nrepl-port

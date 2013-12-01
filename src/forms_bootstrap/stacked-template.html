@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Forms-Bootstrap</title>
+    <link class="style" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"  rel="stylesheet" type="text/css" media="screen" />
+</head>
+
+<body>
+	<div class = "templates container" style="margin-top:30px">
+		<div class="row">
+			<form role="form" action="/someaction" method="post">
+				<legend>Forms-Bootstrap Stacked</legend>
+
+				<!-- Input Field Stacked-->
+				<div class="form-group input-field stacked">
+					<label for="namehere">Stacked input</label>
+					<input class="form-control" name="namehere" type="text" />
+				</div>
+
+				<!-- Text Area Stacked-->
+				<div class="form-group text-area has-error">
+					<label class="control-label" for="textareastacked">textarea</label>
+					<textarea class="form-control" name="textareastacked" rows="3"></textarea>
+				</div>
+
+				<!-- Select Stacked-->
+				<div class="form-group select-dropdown">
+					<label for="namehere">Select</label>
+					<select id="" class="form-control" name="namehere">
+						<option value="optiona">Option A</option>
+					</select>
+				</div>
+
+				<!-- Checkbox or Radio Stacked-->
+				<div class="form-group checkbox-or-radio">
+					<div class="checkbox">
+					  <label>
+					    <input type="checkbox" name="optionslist" value="option1"> Option one is this
+					  </label>
+					</div>
+				</div>
+
+				<!-- File Input Stacked-->
+				<div class="form-group file-input">
+					<label for="namehere">File input</label>
+					<input class="input-file" name="namehere" type="file" />
+				</div>
+
+				<!-- Submit Button Stacked (Left Aligned)-->
+				<div class="form-group" id="submit-button">
+					<button type="submit" class="btn btn-primary">Submit</button>
+					<button type="button" class="btn btn-default">Cancel</button>
+				</div>
+
+				<!-- Inline Inputs (controls-row)-->
+				<div class="form-group inline-fields">
+					<label class="control-label"></label>
+					<div class="controls controls-row">
+					</div>
+				</div>
+
+				<!-- Hidden Input (Same for all)-->
+				<div class="hidden-field">
+					<input type="hidden" />
+				</div>
+			</form> <!-- /form-stacked -->
+		</div> <!-- /row -->
+	</div> <!-- /container -->
+</body>
+</html>

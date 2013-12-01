@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Forms-Bootstrap</title>
+    <link class="style" href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css"  rel="stylesheet" type="text/css" media="screen" />
+</head>
+<body>
+	<div class = "templates container">
+		<form class="form-horizontal" action="/someaction" method="post">
+			<!-- Input Field -->
+			<div class="control-group input-field">
+				<label class="control-label" for="namehere">X-Large input</label>
+				<div class="controls">
+					<input class="input-xlarge" name="namehere" type="text" />
+				</div>
+			</div>
+			<!-- /Input Field-->
+
+			<!-- Text Area-->
+			<div class="control-group text-area">
+				<label class="control-label" for="namehere">textarea</label>
+				<div class="controls">
+					<textarea class="input-xxlarge" name="namehere" rows="3">
+						Hello
+					</textarea>
+				</div>
+			</div>
+			<!-- /Text Area -->
+
+			<!-- Hidden Input -->
+			<div class="controls hidden-field">
+				<input type="hidden" />
+			</div>
+			<!-- /Hidden Input -->
+
+			<!-- Select (dropdown) -->
+			<div class="control-group select-dropdown">
+				<label class="control-label" for="namehere">Select</label>
+				<div class="controls">
+					<select id="" class="xlarge" name="namehere">
+						<option value="optiona">Option A</option>
+					</select>
+				</div>
+			</div>
+			<!-- /Select-->
+
+			<!-- Checkbox or Radio -->
+			<!-- input name is typically the same for all inputs. add a '[]' for checkbox names where you want multiple possible values -->
+			<div class="control-group checkbox-or-radio">
+				<label class ="control-label" name="namehere">List of options</label>
+				<div class="controls">
+					<label class="checkbox">
+						<input type="checkbox" name="optionslist"  value="option1" />
+					</label>
+				</div>
+			</div>
+			<!-- /checkbox-->
+
+			<!-- File Input -->
+			<div class="control-group file-input">
+				<label class="control-label" for="namehere">File input</label>
+				<div class="controls">
+					<input class="input-file" name="namehere" type="file" />
+				</div>
+			</div>
+			<!-- /File Input -->
+
+			<!-- Submit Button -->
+			<div class="form-actions" id="submit-button">
+				<button type="submit" class="btn">Submit</button>
+				<a href="#" id="cancel-link">
+					<input value="Cancel"
+					class="btn" type="button" />
+				</a>
+			</div>
+			<!--/Submit Button -->
+
+			<!-- Inline Inputs (controls-row)-->
+			<div class="control-group inline-fields">
+				<label class="control-label"></label>
+				<div class="controls controls-row">
+				</div>
+			</div>
+			<!-- /Inline -->
+		</form>
+	</div>
+	<script type="text/javascript" src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -10,10 +10,11 @@
   "Takes in a string and any number of search words. Returns true if
   all of the search words can be found in the input string. "
   [sentence & search-words]
-  (let [sent-freq (frequencies (re-seq #"[^\s]+" sentence))
-        matches (filter true?
-                        (map #(contains? sent-freq %1) search-words))]
-    (= (count matches) (count search-words))))
+  (when sentence
+    (let [sent-freq (frequencies (re-seq #"[^\s]+" sentence))
+          matches (filter true?
+                          (map #(contains? sent-freq %1) search-words))]
+      (= (count matches) (count search-words)))))
 
 (defn first-word
   "Takes an input string and returns the first word in it"
@@ -31,3 +32,9 @@
   with the value inserted at the given position."
   [v pos val]
   (apply conj (subvec v 0 pos) val (subvec v pos)))
+
+(defmacro if-seq
+  [t f]
+  `(if (seq ~t)
+     (~f ~t)
+     identity))
