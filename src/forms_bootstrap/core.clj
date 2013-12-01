@@ -24,7 +24,7 @@
 (def form-template "forms_bootstrap/horizontal-template.html")
 
 ;; ## HELPER FUNCTIONS
-(defn html
+(defn to-html
   "Takes in nodes and emits HTML"
   [nodes]
   (println (apply str (emit* nodes))))
