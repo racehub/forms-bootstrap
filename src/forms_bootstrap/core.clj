@@ -128,16 +128,18 @@
               identity)))
 
 ;;label-size and control-size must add up to 12.
+;;form-group-style is for the outer div (.formgroup .inputfield)
+;;hidden appends "display:none" to form-group-style
 (defsnippet input-field
   form-template
   [:div.input-field]
-  [{:keys [hidden name label errors help-block label-size control-size]
+  [{:keys [hidden name label errors help-block label-size control-size form-group-style]
     :or {label-size 3
          control-size 9}
     :as m}]
-  [:div.input-field] (do-> (if hidden
-                             (add-class "hidden")
-                             identity)
+  [:div.input-field] (do-> (maybe-set-attrs {:style (if hidden
+                                                      (str "display:none;" form-group-style)
+                                                      form-group-style)})
                            (handle-error-css errors))
   [:label] (do-> (content label)
                  (set-attr :class (str "control-label col-sm-" label-size)
@@ -167,13 +169,13 @@
 (defsnippet text-area-field
   form-template
   [:div.text-area]
-  [{:keys [hidden name label errors help-block label-size control-size]
+  [{:keys [hidden name label errors help-block label-size control-size form-group-style]
     :or {label-size 3
          control-size 9}
     :as m}]
-  [:div.text-area] (do-> (if hidden
-                           (add-class "hidden")
-                           identity)
+  [:div.text-area] (do-> (maybe-set-attrs {:style (if hidden
+                                                    (str "display:none;" form-group-style)
+                                                    form-group-style)})
                          (handle-error-css errors))
   [:label] (do-> (content label)
                  (set-attr :class (str "control-label col-sm-" label-size)
@@ -216,13 +218,13 @@
 (defsnippet select-field
   form-template
   [:div.select-dropdown]
-  [{:keys [hidden name label errors help-block label-size control-size]
+  [{:keys [hidden name label errors help-block label-size control-size form-group-style]
     :or {label-size 3
          control-size 9}
     :as m}]
-  [:div.select-dropdown] (do-> (if hidden
-                                 (add-class "hidden")
-                                 identity)
+  [:div.select-dropdown] (do-> (maybe-set-attrs {:style (if hidden
+                                                          (str "display:none;" form-group-style)
+                                                          form-group-style)})
                                (handle-error-css errors))
   [:label] (do-> (content label)
                  (set-attr :class (str "control-label col-sm-" label-size)
@@ -276,13 +278,14 @@
 (defsnippet checkbox-or-radio
   form-template
   [:.checkbox-or-radio.inline]
-  [{:keys [hidden class name label errors help-block label-size control-size]
+  [{:keys [hidden class name label errors help-block label-size control-size form-group-style]
     :or {label-size 3
          control-size 9}
     :as m}]
-  [:div.checkbox-or-radio]  (do-> (if hidden
-                                    (add-class "hidden")
-                                    identity)
+  [:div.checkbox-or-radio]  (do-> (maybe-set-attrs {:style
+                                                    (if hidden
+                                                      (str "display:none;" form-group-style)
+                                                      form-group-style)})
                                   (handle-error-css errors)
                                   (add-class class))
   [:label.control-label] (do-> (content label)
@@ -303,13 +306,16 @@
 (defsnippet file-input
   form-template
   [:div.file-input]
-  [{:keys [hidden name label errors help-block label-size control-size] :as m
+  [{:keys [hidden name label errors help-block label-size control-size form-group-style]
+    :as m
     :or {label-size 3
          control-size 9}}]
-  [:div.file-input] (do-> (if hidden
-                            (add-class "hidden")
-                            identity)
-                          (handle-error-css errors))
+  [:div.file-input] (do-> (maybe-set-attrs {:style
+                                            (if hidden
+                                              (str "display:none;" form-group-style)
+                                              form-group-style)})
+                          (handle-error-css errors)
+                          (add-class class))
   [:label] (do-> (content label)
                  (set-attr :class (str "control-label col-sm-" label-size)
                            :for name))
@@ -332,14 +338,18 @@
                           (wrap :div {:class (str "control-size col-sm-" grid-size)})
                           identity)))
 
+;;'grid' is used for the control size, specifies size + offset.
 (defsnippet button-field
   form-template
-  [:div.submit-button :.btn-primary]
-  [{:keys [grid] :as m
+  [:div.submit-button]
+  [{:keys [grid hidden form-group-style] :as m
     :or {grid "col-sm-offset-3 col-sm-9"}}]
-  [:.btn-primary] (do-> (substitute (button-lite m))
-                        (wrap :div {:class grid})
-                        (wrap :div {:class "form-group"})))
+  [:.submit-button] (maybe-set-attrs {:style
+                                      (if hidden
+                                        (str "display:none;" form-group-style)
+                                        form-group-style)})
+  [:div.control-size]  (set-attr :class (str "control-size " grid))
+  [:.btn-primary] (substitute (button-lite m)))
 
 (defsnippet make-submit-button
   form-template
