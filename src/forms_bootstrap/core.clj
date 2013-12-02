@@ -1,8 +1,8 @@
 (ns forms-bootstrap.core
   (:use net.cgrand.enlive-html
-        forms-bootstrap.util
-        [sandbar.validation :only (if-valid)])
-  (:require [noir.validation :as vali]
+        forms-bootstrap.util)
+  (:require [forms-bootstrap.validation :refer [if-valid]]
+            [noir.validation :as vali]
             [compojure.core :as c]
             [clojure.string :as string]
             [noir.session :as session]
