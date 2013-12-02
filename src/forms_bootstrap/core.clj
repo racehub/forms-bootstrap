@@ -111,20 +111,21 @@
 
 ;; ex: [:name "namehere" :label "labelhere" :type "text"
 ;;      :size "xlarge" :errors ["some error"] :default "john"]
-;;Custom-attrs is a map of key/value pairs of attributes
+;;Custom-attrs is a map of key/value pairs of input attrs
+;;div-attrs is a map of key/value pairs of the outer control-size div attrs
 (defsnippet input-lite
   form-template
   [:div.input-field :input]
   [{:keys [id name class type default disabled placeholder value onclick style custom-attrs
-           grid-size]}]
+           div-attrs]}]
   [:input] (do->
             (maybe-set-attrs (merge {:name name :type type :class class :style style
                                      :placeholder placeholder :id id :onclick onclick}
                                     custom-attrs))
             (set-value value default)
             (maybe-disable disabled)
-            (if (seq (str grid-size))
-              (wrap :div {:class (str "control-size col-sm-" grid-size)})
+            (if (map? div-attrs)
+              (wrap :div div-attrs)
               identity)))
 
 ;;label-size and control-size must add up to 12.
@@ -154,7 +155,7 @@
 (defsnippet text-area-lite
   form-template
   [:div.text-area :textarea]
-  [{:keys [name label rows errors value default class style custom-attrs id grid-size]
+  [{:keys [name label rows errors value default class style custom-attrs id div-attrs]
     :or {rows "3"}}]
   [:textarea] (do-> (maybe-set-attrs (merge
                                       {:class class :style style :name name :rows (str rows)
@@ -162,8 +163,8 @@
                                       custom-attrs))
                     (set-value value default)
                     (content default)
-                    (if (seq (str grid-size))
-                      (wrap :div {:class (str "control-size col-sm-" grid-size)})
+                    (if (map? div-attrs)
+                      (wrap :div div-attrs)
                       identity)))
 
 (defsnippet text-area-field
@@ -192,14 +193,14 @@
 (defsnippet select-lite
   form-template
   [:div.select-dropdown :select]
-  [{:keys [name style class label inputs custom-inputs default type custom-attrs id grid-size]}]
+  [{:keys [name style class label inputs custom-inputs default type custom-attrs id div-attrs]}]
   [:select] (do->
              (maybe-set-attrs {:name name :id id :style style :class class})
              (if (string-contains? type "multiple")
                (set-attr :multiple "multiple")
                identity)
-             (if (seq (str grid-size))
-               (wrap :div {:class (str "control-size col-sm-" grid-size)})
+             (if (map? div-attrs)
+               (wrap :div div-attrs)
                identity))
   [:option] (if custom-inputs
               (clone-for [[label {:keys [value] :as attrs}] custom-inputs]
@@ -327,15 +328,15 @@
 (defsnippet button-lite
   form-template
   [:div.submit-button :.btn-primary]
-  [{:keys [text class name button-attrs type grid-size]
+  [{:keys [text class name button-attrs type div-attrs]
     :or {class "btn btn-default"}}]
   [:.btn-primary] (do-> (content text)
                         (maybe-set-attrs (merge {:class class
                                                  :name name
                                                  :type type}
                                                 button-attrs))
-                        (if (seq (str grid-size))
-                          (wrap :div {:class (str "control-size col-sm-" grid-size)})
+                        (if (map? div-attrs)
+                          (wrap :div div-attrs)
                           identity)))
 
 ;;'grid' is used for the control size, specifies size + offset.

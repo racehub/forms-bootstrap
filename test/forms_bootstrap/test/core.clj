@@ -97,11 +97,15 @@
                                         :value "123"}
                                        {:name "firstthing"
                                         :type "text"
-                                        :grid-size 4
+                                        :div-attrs {:class "col-md-4"}
                                         :placeholder "A"}
+                                       {:name "hidden-text-field"
+                                        :type "text"
+                                        :div-attrs {:class "col-md-4"
+                                                    :style "display:none"}}
                                        {:type "button"
                                         :class "btn btn-default"
-                                        :grid-size 2
+                                        :div-attrs {:class "col-md-2"}
                                         :name "abutton"
                                         :button-attrs {:onclick "alert('something')"}
                                         :text "Do something!"}
@@ -250,21 +254,21 @@
                          :columns [{:name "birthday-day"
                                     :type "select"
                                     :size "input-small"
-                                    :grid-size 3
+                                    :div-attrs {:class "col-md-3"}
                                     :inputs (let [days (reduce #(conj %1 [(str %2) (str %2)])
                                                                [] (range 1 32))]
                                               (u/insert days 0 ["" "Day"]))}
                                    {:name "birthday-month"
                                     :type "select"
                                     :size "input-small"
-                                    :grid-size 3
+                                    :div-attrs {:class "col-md-3"}
                                     :inputs (let [days (reduce #(conj %1 [(str %2) (str %2)])
                                                                [] (range 1 13))]
                                               (u/insert days 0 ["" "Month"]))}
                                    {:name "birthday-year"
                                     :type "select"
                                     :size "input-small"
-                                    :grid-size 3
+                                    :div-attrs {:class "col-md-3"}
                                     :inputs (let [year (reduce #(conj %1 [(str %2) (str %2)])
                                                                [] (reverse
                                                                    (range 1900 2013)))]
