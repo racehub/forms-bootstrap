@@ -383,11 +383,12 @@
 (defsnippet inline-fields
   form-template
   [:div.inline-fields]
-  [{:keys [label columns inline-content hidden help-block label-size]
+  [{:keys [label columns inline-content hidden help-block label-size form-group-style]
     :or {label-size 3}}]
-  [:div.inline-fields] (do-> (if hidden
-                               (add-class "hidden")
-                               identity)
+  [:div.inline-fields] (do-> (maybe-set-attrs {:style
+                                               (if hidden
+                                                 (str "display:none;" form-group-style)
+                                                 form-group-style)})
                              (handle-error-css (some (fn[a] a) (map :errors columns))))
   [:label.control-label] (do-> (content label)
                                (set-attr :class (str "control-label col-sm-" label-size)))
