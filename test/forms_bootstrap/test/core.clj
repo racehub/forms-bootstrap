@@ -2,10 +2,10 @@
   (:use net.cgrand.enlive-html)
   (:require [forms-bootstrap.util :as u]
             [forms-bootstrap.core :as c]
+            [forms-bootstrap.validation :as v]
             [noir.response :as response]
             [noir.session :as session]
-            [clojure.data.json :as json]
-            [sandbar.validation :as v]))
+            [clojure.data.json :as json]))
 
 (def test-template "forms_bootstrap/test/test-page.html")
 
