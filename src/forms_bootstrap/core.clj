@@ -74,6 +74,9 @@
          (map (fn [[attr val]] (if-seq val #(set-attr attr %)))
               kvs)))
 
+;; TODO: If we want to get fancy, we can use a multimethod on the
+;; glyph input to customize what we do with the string, rather than
+;; assuming it's the name of a bootstrap glyph.
 (defn input-glyph
   "If the glyph is present, prepends it to the supplied input."
   [glyph]
