@@ -2,7 +2,6 @@
   (:use net.cgrand.enlive-html
         forms-bootstrap.util)
   (:require [forms-bootstrap.validation :refer [if-valid]]
-            [noir.validation :as vali]
             [compojure.core :as c]
             [clojure.string :as string]
             [noir.session :as session]
@@ -72,8 +71,24 @@
   and sets the non-empty attributes."
   [kvs]
   (apply do->
-         (map (fn[[attr val]] (if-seq val #(set-attr attr %)))
+         (map (fn [[attr val]] (if-seq val #(set-attr attr %)))
               kvs)))
+
+(defn input-glyph
+  "If the glyph is present, prepends it to the supplied input."
+  [glyph]
+  (if glyph
+    (do-> (wrap :div {:class "input-group"})
+          (prepend (html [:span {:class "input-group-addon"}
+                          [:span {:class (str "glyphicon glyphicon-" glyph)}]])))
+    identity))
+
+(defn button-glyph
+  "If the glyph is present, prepends it to the supplied button."
+  [glyph]
+  (if glyph
+    (prepend (html [:span {:class (str "glyphicon glyphicon-" glyph)}]))
+    identity))
 
 ;; ## SNIPPETS
 
@@ -102,9 +117,10 @@
 (defsnippet hidden-input
   form-template
   [:div.hidden-field :input]
-  [{:keys [id class name default disabled value]
+  [{:keys [id class name default disabled value glyph]
     :or {default ""}}]
   [:input] (do->
+            (input-glyph glyph)
             (maybe-set-attrs {:name name :class class :id id})
             (set-value value default)
             (maybe-disable disabled)))
@@ -116,14 +132,15 @@
 (defsnippet input-lite
   form-template
   [:div.input-field :input]
-  [{:keys [id name class type default disabled placeholder value onclick style custom-attrs
-           div-attrs]}]
+  [{:keys [id name class type default disabled placeholder value
+           onclick style custom-attrs glyph div-attrs]}]
   [:input] (do->
             (maybe-set-attrs (merge {:name name :type type :class class :style style
                                      :placeholder placeholder :id id :onclick onclick}
                                     custom-attrs))
             (set-value value default)
             (maybe-disable disabled)
+            (input-glyph glyph)
             (if (map? div-attrs)
               (wrap :div div-attrs)
               identity)))
@@ -134,7 +151,8 @@
 (defsnippet input-field
   form-template
   [:div.input-field]
-  [{:keys [hidden name label errors help-block label-size control-size form-group-style]
+  [{:keys [hidden name label errors help-block label-size control-size
+           form-group-style]
     :or {label-size 3
          control-size 9}
     :as m}]
@@ -328,13 +346,14 @@
 (defsnippet button-lite
   form-template
   [:div.submit-button :.btn-primary]
-  [{:keys [text class name button-attrs type div-attrs]
+  [{:keys [text class name button-attrs type div-attrs glyph]
     :or {class "btn btn-default"}}]
   [:.btn-primary] (do-> (content text)
                         (maybe-set-attrs (merge {:class class
                                                  :name name
                                                  :type type}
                                                 button-attrs))
+                        (button-glyph glyph)
                         (if (map? div-attrs)
                           (wrap :div div-attrs)
                           identity)))
@@ -397,34 +416,61 @@
   [[:div.control-size first-of-type]] (add-spans [(some (fn[a] a) (map :errors columns))]
                                                  help-block))
 
-(defn make-field
+(defmulti make-field
   "Takes a single map representing a form element's attributes and
   routes it to the correct snippet based on its type. Supports input
   fields, text areas, dropdown menus, checkboxes, radios, and file
   inputs. Ex: {:type 'text' :name 'username' :label 'Username' :errors
   ['Incorrect username'] :default ''}"
+  (fn [form-class m]
+    (first-word (:type m))))
+
+(defmethod make-field "text"
   [form-class m]
-  (case (first-word (:type m))
-    "text"       (make-field-helper form-class
-                                    input-field input-lite m)
-    "hidden" (hidden-input m)
-    "password"   (input-field (dissoc m :default))
-    "button" (make-field-helper form-class
-                                button-field button-lite m)
-    "text-area"  (make-field-helper form-class
-                                    text-area-field text-area-lite m)
-    "select"     (make-field-helper form-class
-                                    select-field select-lite m)
-    "radio"      (make-field-helper form-class
-                                    checkbox-or-radio checkbox-or-radio-lite m)
-    "checkbox"   (make-field-helper form-class
-                                    checkbox-or-radio checkbox-or-radio-lite m)
-    "inline-fields" (inline-fields (assoc m :inline-content
-                                          (map
-                                           #(make-field "form-inline" %)
-                                           (:columns m))) )
-    "custom" (:html-nodes m)
-    "file-input" (file-input m)))
+  (make-field-helper form-class input-field input-lite m))
+
+(defmethod make-field "hidden"
+  [form-class m]
+  (hidden-input m))
+
+(defmethod make-field "password"
+  [form-class m]
+  (input-field (dissoc m :default)))
+
+(defmethod make-field "button"
+  [form-class m]
+  (make-field-helper form-class button-field button-lite m))
+
+(defmethod make-field "text-area"
+  [form-class m]
+  (make-field-helper form-class text-area-field text-area-lite m))
+
+(defmethod make-field "select"
+  [form-class m]
+  (make-field-helper form-class select-field select-lite m))
+
+(defmethod make-field "radio"
+  [form-class m]
+  (make-field-helper form-class checkbox-or-radio checkbox-or-radio-lite m))
+
+(defmethod make-field "checkbox"
+  [form-class m]
+  (make-field-helper form-class checkbox-or-radio checkbox-or-radio-lite m))
+
+(defmethod make-field "inline-fields"
+  [form-class m]
+  (inline-fields
+   (assoc m
+     :inline-content (map #(make-field "form-inline" %)
+                          (:columns m))) ))
+
+(defmethod make-field "custom"
+  [form-class m]
+  (:html-nodes m))
+
+(defmethod make-field "file-input"
+  [form-class m]
+  (file-input m))
 
 (defn inline-errs-defs
   "Used by make-form to add errors and defaults for form fields of
@@ -479,21 +525,6 @@
 
 ;;MACROS
 
-;; @vali/*errors* looks like:
-;;  {:title [["title must be an integer number!"]], :location
-;;  [["location cannot be blank!"]]}
-;; 'errors' are the sandbar :_validation-errors from the result of validating
-;;  the form map.
-;; WE DONT DO THIS ANYMORE
-(defn move-errors-to-noir
-  "Moves errors from sandbar to Noir and returns the form-data."
-  [form-data errors]
-  (comment (println "(FBS) Post request failed validation! Sandbar errors (moving to noir): "
-                    errors "\n"))
-  (doseq [[field [error]] errors]
-    (vali/set-error field error))
-  (assoc form-data :_sandbar-errors errors))
-
 (defn move-errors-to-flash
   "Moves the errors from sandbar validation and any form-data (values
   that were just submitted) over to the flash to be used when we
@@ -547,8 +578,6 @@
   defaults and errors from validation. Ex: {:somekey {:errors ['error
   mesage'] :default 'default message here'}"
   [default-values] ;;values from a db or something
-  ;;  (println "(FBS) Making form. All Noir errors: " @vali/*errors*)
-  ;;  (println "(FBS) Making form. Form Params: " m)
   (let [flash-data (session/flash-get :form-data) ;;data from prev submission
         flash-errors (:_sandbar-errors flash-data) ;;errors
         m (if (seq flash-data)
@@ -566,14 +595,11 @@
         errors (if (seq flash-errors)
                  (maybe-conj
                   (map (fn[[k v]] {k {:errors v :default ""}}) flash-errors))
-                 {})
-        errs-defs  (merge-with
-                    (fn[a b] {:errors (:errors b) :default (:default a)})
-                    defaults errors)]
-    ;;    (println "(FBS) Noir ERRORS: " @vali/*errors*)
-    ;;    (println "(FBS) Sandbar ERRORS: " (:_sandbar-errors form-map))
-    ;; (println "(FBS) Making form. Computed errors / defaults map: " errs-defs)
-    errs-defs))
+                 {})]
+    (merge-with (fn [a b]
+                  {:errors (:errors b)
+                   :default (:default a)})
+                defaults errors)))
 
 ;;Can Use post-helper with make-form when you don't have enough info to use
 ;;form-helper.
