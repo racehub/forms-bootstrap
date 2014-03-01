@@ -1,7 +1,7 @@
 # Forms-Bootstrap
 
 Forms-Bootstrap is a utility for creating web forms in Clojure, styled using
-[Bootstrap CSS 3.0](http://getbootstrap.com/). It is built to be used with 
+[Bootstrap CSS 3.0](http://getbootstrap.com/). It is built to be used with
 [Enlive](https://github.com/cgrand/enlive) HTML templating.
 You can use forms-bootstrap to quickly make nicely styled forms for your web app. It is easy to validate
 your forms and display well formatted error messages next to the appropriate fields. You can also pre-populate
@@ -12,7 +12,7 @@ the form with default data from a source of your choice.
 Forms-Bootstrap is hosted on Clojars. Add
 
 ```clojure
-[paddleguru/forms-bootstrap "0.7.0"]
+[paddleguru/forms-bootstrap "0.7.3"]
 ```
 
 to your dependencies in project.clj.
