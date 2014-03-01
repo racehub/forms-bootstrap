@@ -1,10 +1,8 @@
 # Forms-Bootstrap
 
 Forms-Bootstrap is a utility for creating web forms in Clojure, styled using
-[Twitter's Bootstrap CSS](http://twitter.github.com/bootstrap/). It is built to be used with the
-[Noir](https://github.com/noir-clojure/noir) web framework,
-[Enlive](https://github.com/cgrand/enlive) HTML templating, and validation using
-[Sandbar](https://github.com/brentonashworth/sandbar).
+[Bootstrap CSS 3.0](http://getbootstrap.com/). It is built to be used with 
+[Enlive](https://github.com/cgrand/enlive) HTML templating.
 You can use forms-bootstrap to quickly make nicely styled forms for your web app. It is easy to validate
 your forms and display well formatted error messages next to the appropriate fields. You can also pre-populate
 the form with default data from a source of your choice.
@@ -19,12 +17,10 @@ Forms-Bootstrap is hosted on Clojars. Add
 
 to your dependencies in project.clj.
 
-Forms-Bootstrap uses Twitter Bootstrap Version 3.0. Make sure to download [Bootstrap CSS 3.0](http://twitter.github.com/bootstrap/) and add it to your HTML files!
+Forms-Bootstrap uses Twitter Bootstrap Version 3.0. Make sure to download [Bootstrap CSS 3.0](http://getbootstrap.com/) and add it to your HTML files!
 
 ## Supported Form Controls / Styles
 
-Forms-Bootstrap currently supports all the form controls and form styles listed on
-[Twitter Bootstrap's Forms Page](http://twitter.github.com/bootstrap/base-css.html#forms), with the exception of prepended and appended inputs. Check out that page to get an idea of what styles are available. Here is a brief summary:
 
 Forms can have class 'inline form' for forms that go left to right, or class 'horizontal form' (default) for forms that go down the page. Specify the form class with :class. You can also specify a legend for the form with :legend.
 
