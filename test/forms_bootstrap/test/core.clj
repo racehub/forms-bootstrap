@@ -68,6 +68,7 @@
                    :fields [{:type "text"
                              :name "nickname"
                              :label "Nick Name"
+                             :glyph "volume-off"
                              :size "input-large"}
                             {:type "custom"
                              :html-nodes [{:tag :div
@@ -81,7 +82,8 @@
                              :inputs [["checked" "I agree"]]}
                             {:type "password"
                              :name "password"
-                             :label "Password"}
+                             :label "Password"
+                             :glyph "lock"}
                             {:type "hidden"
                              :name "myhiddenfield"}
                             {:type "text"
@@ -104,6 +106,7 @@
                                         :div-attrs {:class "col-md-4"
                                                     :style "display:none"}}
                                        {:type "button"
+                                        :glyph "lock"
                                         :class "btn btn-default"
                                         :div-attrs {:class "col-md-2"}
                                         :name "abutton"
