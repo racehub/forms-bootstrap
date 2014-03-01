@@ -1,4 +1,4 @@
-(defproject paddleguru/forms-bootstrap "0.7.1"
+(defproject paddleguru/forms-bootstrap "0.7.2"
   :description "Utility for creating web forms using Twitter's Bootstrap CSS"
   :url "https://github.com/paddleguru/forms-bootstrap"
   :license {:name "Apache License, Version 2.0"
