@@ -216,7 +216,8 @@
   [:div.select-dropdown :select]
   [{:keys [name style class label inputs custom-inputs default type custom-attrs id div-attrs]}]
   [:select] (do->
-             (maybe-set-attrs {:name name :id id :style style :class class})
+             (maybe-set-attrs (merge {:name name :id id :style style :class class}
+                                     custom-attrs))
              (if (string-contains? type "multiple")
                (set-attr :multiple "multiple")
                identity)
