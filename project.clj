@@ -4,7 +4,7 @@
   :license {:name "Apache License, Version 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
   :dependencies [[org.clojure/clojure "1.5.1"]
-                 [lib-noir "0.7.2"]
+                 [lib-noir "0.7.5"]
                  [enlive "1.1.4"]]
   :main forms-bootstrap.server
   :profiles {:dev {:dependencies [[compojure "1.1.5"]
