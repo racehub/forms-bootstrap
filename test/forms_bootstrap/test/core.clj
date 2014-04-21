@@ -194,8 +194,7 @@
 
 ;; Post Helper Example
 (def post-fn-example
-  (c/post-fn :post-url "/someaction"
-             :validator (v/build-validator (v/non-empty-string :nickname))
+  (c/post-fn :validator (v/build-validator (v/non-empty-string :nickname))
              :on-success (fn [m]
                            ;;on success actions here
                            (println "Successful validation. Your form map: " m)
@@ -319,7 +318,6 @@
   :validator (v/build-validator (v/non-empty-string :first-name)
                                 (v/non-empty-string :last-name)
                                 (email-valid?))
-  :post-url "/:user/action"
   :submit-label "Sign Up!"
   :enctype "multipart/form-data"
   :fields [{:name "first-name"
