@@ -2,7 +2,6 @@
   (:use net.cgrand.enlive-html
         forms-bootstrap.util)
   (:require [forms-bootstrap.validation :refer [if-valid]]
-            [compojure.core :as c]
             [clojure.string :as string]
             [noir.session :as session]
             [noir.response :as response]))
@@ -605,28 +604,23 @@
                    :default (:default a)})
                 defaults errors)))
 
-;;Can Use post-helper with make-form when you don't have enough info to use
-;;form-helper.
-(defmacro post-helper
-  [& {:keys [post-url validator on-success on-failure]}]
-  `(c/POST ~post-url [:as {m# :params}]
-           (if-valid ~validator m#
-                     ~on-success
-                     (comp ~on-failure move-errors-to-flash))))
+(defn post-fn
+  [& {:keys [validator on-success on-failure]}]
+  (fn [req]
+    (if-valid validator (:params req)
+              on-success
+              (comp on-failure move-errors-to-flash))))
 
-;;Takes a validator function, an url (route) to POST to, a sequence of
-;;maps each containing a form element's attributes, a submit label for
-;;the form, and functions to call in the POST handler on success or
-;;failure
-(defmacro form-helper
-  "Generates a function that can be used the make the form, and registers a POST handler with Noir. "
-  [sym & {:keys [fields method post-url validator on-success on-failure submit-label]
+(defmacro defform
+  "Generates a function that can be used the make the form, and
+  generates a *-post function that can be used with Compojure.."
+  [sym & {:keys [fields method validator on-success on-failure submit-label]
           :or {on-success (constantly (response/redirect "/"))
                validator  identity
                method "post"}
           :as opts}]
-  (assert (and post-url fields on-success on-failure)
-          "Please provide :post-url, :fields, and :on-failure to form-helper.")
+  (assert (and fields on-success on-failure)
+          "Please provide :fields, and :on-failure to form-helper.")
   `(do
      (defn ~sym
        ([defaults# action# cancel-link#]
@@ -644,7 +638,6 @@
                (apply concat)
                (apply make-form))))
      (def ~(symbol (str sym "-post"))
-       (post-helper :post-url ~post-url
-                    :validator ~validator
-                    :on-success ~on-success
-                    :on-failure ~on-failure))))
+       (post-fn :validator ~validator
+                :on-success ~on-success
+                :on-failure ~on-failure))))
