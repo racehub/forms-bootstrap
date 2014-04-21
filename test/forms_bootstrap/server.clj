@@ -1,5 +1,5 @@
 (ns forms-bootstrap.server
-  (:require [compojure.core :refer (GET)]
+  (:require [compojure.core :refer [GET POST]]
             [compojure.route :as route]
             [forms-bootstrap.core :as core]
             [forms-bootstrap.test.core :as c]
@@ -26,8 +26,8 @@
              [[(c/helper-example-user default-values (str "/" user "/action") "/")
                "Form-helper Example"
                "Uses the form-helper macro for easy validation."]]})))
-    c/helper-example-post
-    c/post-helper-example
+    (POST "/some-post-url" [] c/form-example-post)
+    (POST "/someaction" [] c/post-fn-example)
     (route/not-found "<p>Page not found.</p>")]))
 
 ;; Note that this library requires nm/app-handler to work, since we
