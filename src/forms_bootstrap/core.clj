@@ -213,8 +213,10 @@
 (defsnippet select-lite
   form-template
   [:div.select-dropdown :select]
-  [{:keys [name style class label inputs custom-inputs default type custom-attrs id div-attrs]}]
+  [{:keys [name style class label inputs custom-inputs default type custom-attrs id
+           div-attrs disabled]}]
   [:select] (do->
+             (maybe-disable disabled)
              (maybe-set-attrs (merge {:name name :id id :style style :class class}
                                      custom-attrs))
              (if (string-contains? type "multiple")
