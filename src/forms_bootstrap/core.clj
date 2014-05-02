@@ -589,15 +589,20 @@
         ;;on first load uses default data (ie from db), then POST DATA ONLY on a reload
         defaults (if (seq m)
                    (maybe-conj
-                    (map (fn[[k v]] {k {:errors nil :default (if (coll? v)
-                                                              (if (file-input? v)
-                                                                nil
-                                                                (map str v))
-                                                              (str v))}}) m))
+                    (map (fn [[k v]]
+                           (let [default (if (coll? v)
+                                           (when-not (file-input? v)
+                                             (map str v))
+                                           (str v))]
+                             {(keyword k) {:errors nil
+                                           :default default}}))
+                         m))
                    {})
         errors (if (seq flash-errors)
                  (maybe-conj
-                  (map (fn[[k v]] {k {:errors v :default ""}}) flash-errors))
+                  (map (fn [[k v]]
+                         {(keyword k) {:errors v :default ""}})
+                       flash-errors))
                  {})]
     (merge-with (fn [a b]
                   {:errors (:errors b)
