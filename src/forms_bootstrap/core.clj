@@ -588,7 +588,8 @@
         m (if (seq flash-data)
             (dissoc flash-data :_sandbar-errors)
             default-values)
-        ;;on first load uses default data (ie from db), then POST DATA ONLY on a reload
+        ;;on first load uses default data (ie from db), then POST DATA
+        ;;ONLY on a reload
         defaults (if (seq m)
                    (maybe-conj
                     (map (fn [[k v]]
