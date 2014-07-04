@@ -7,7 +7,9 @@
                  [lib-noir "0.8.4" :exclusions [ring/ring]]
                  [enlive "1.1.5"]]
   :main forms-bootstrap.server
-  :profiles {:dev {:dependencies [[compojure "1.1.5"]
-                                  [http-kit "2.1.13"]
-                                  [ring/ring-core "1.2.0"]
+  :profiles {:dev {:dependencies [[compojure "1.1.8"]
+                                  [http-kit "2.1.18"]
+                                  [javax.servlet/servlet-api "2.5"]
+                                  [ring/ring-core "1.3.0"]
+                                  [ring/ring-devel "1.3.0"]
                                   [org.clojure/data.json "0.2.1"]]}})
