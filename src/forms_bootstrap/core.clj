@@ -40,7 +40,7 @@
   [type content]
   {:tag "span"
    :attrs {:class type}
-   :content content})
+   :content (collectify content)})
 
 (defn add-spans
   "Used by enlive snippets to add a span to display errors (if
@@ -110,7 +110,7 @@
                 (if-seq enctype #(set-attr :enctype %))
                 (content (if (seq legend)
                            [{:tag :legend
-                             :content legend}
+                             :content [legend]}
                             fields]
                            fields))
                 (append submitter)))
