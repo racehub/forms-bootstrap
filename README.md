@@ -12,7 +12,7 @@ the form with default data from a source of your choice.
 Forms-Bootstrap is hosted on Clojars. Add
 
 ```clojure
-[paddleguru/forms-bootstrap "0.7.0"]
+[paddleguru/forms-bootstrap "0.9.1"]
 ```
 
 to your dependencies in project.clj.
